@@ -504,10 +504,16 @@ CmdEnquanto   	:	ENQUANTO  ABPAR  {
                         $<quad>5->result.atr.rotulo = GeraQuadrupla (NOP, opndidle, opndidle, opndidle);
                     }
                 ;
-CmdRepetir  	:   REPETIR {printf ("repetir ");} Comando
+CmdRepetir  	:   REPETIR {
+                        printf ("repetir "); 
+                        $<quad>$ = GeraQuadrupla (NOP, opndidle, opndidle, opndidle);
+                    } Comando
                     ENQUANTO  ABPAR {printf ("enquanto ( ");}  Expressao  {
                         if ($7.tipo != LOGICAL)
                             Incompatibilidade ("Expressao nao logica em comando enquanto");
+                        opndaux.tipo = ROTOPND;
+                        opndaux.atr.rotulo = $<quad>2;
+                        GeraQuadrupla (OPJF, $7.opnd, opndidle, opndaux);
                     }
 				    FPAR  PVIRG {printf (") ;\n");}
                 ;

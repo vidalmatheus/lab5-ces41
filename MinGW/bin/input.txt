@@ -8,17 +8,21 @@ programa HelloWorld {{{
         logic (booleana)
    }
    comandos {
-        escrever("Hello World!");
-        /*mat[3,4] = 10;*/
-        n = 15;
-        ler(c);
-        booleana = falso;
+          escrever("Hello World!");
+          /*mat[3,4] = 10;*/
+          n = 15;
+          ler(c);
+          booleana = falso;
 
-        se (booleana) c = 'a';
-        senao numero = 2.5;
+          se (booleana) c = 'a';
+          senao numero = 2.5;
 
-        i = 5;
-        escrever("Hello World!");
+          repetir 
+               numero = numero+1;
+          enquanto (!booleana);
+
+          i = 5;
+          escrever("Hello World!");
    }
 
 }}} /* Fim do programa HelloWorld */
