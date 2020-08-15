@@ -1,0 +1,24 @@
+programa HelloWorld {{{
+   
+   principal
+   var {
+        carac (c, word[10])
+        int (i, n, mat[5,5])
+        real (numero)
+        logic (booleana)
+   }
+   comandos {
+        escrever("Hello World!");
+        mat[3,4] = 10;
+        n = 15;
+        ler(c);
+        booleana = falso;
+
+        se (booleana) word[2] = 'a';
+        senao numero = 2.5;
+
+        i = 5;
+        escrever("Hello World!");
+   }
+
+}}} /* Fim do programa HelloWorld */
