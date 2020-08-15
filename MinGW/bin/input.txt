@@ -3,7 +3,7 @@ programa HelloWorld {{{
    principal
    var {
         carac (c, word[10])
-        int (i, n, mat[5,5])
+        int (i, n, mat[5,5], prod)
         real (numero)
         logic (booleana)
    }
@@ -20,6 +20,11 @@ programa HelloWorld {{{
           repetir 
                numero = numero+1;
           enquanto (!booleana);
+
+          prod = 1;
+          para i (1;i<=n;i+1) {
+               prod = prod*i;
+          }
 
           i = 5;
           escrever("Hello World!");

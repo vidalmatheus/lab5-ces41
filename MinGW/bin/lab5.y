@@ -205,7 +205,7 @@ struct celmodhead {
 
 /* Variaveis globais para o codigo intermediario */
 
-quadrupla quadcorrente, quadaux;
+quadrupla quadcorrente, quadaux, quadaux2;
 modhead codintermed, modcorrente;
 int oper, numquadcorrente;
 operando opnd1, opnd2, result, opndaux;
@@ -527,18 +527,39 @@ CmdPara	    	:   PARA  {printf ("para ");}  Variavel
                     }
                     ABPAR {printf ("( ");} ExprAux4
                     {
+                        GeraQuadrupla (PARAM, $7.opnd, opndidle, opndidle);
                         if ($7.tipo != INTEGER && $7.tipo != CHAR)
                             Incompatibilidade ("Expressao do tipo nao inteira e nao caractere em comando para");
                     }
-                    PVIRG {printf ("; ");} Expressao
+                    PVIRG {
+                            printf ("; ");
+                            $<quad>$ = GeraQuadrupla (NOP, opndidle, opndidle, opndidle);
+                        } Expressao
                     {
                         if ($11.tipo != LOGICAL)
                             Incompatibilidade ("Expressao do tipo nao logica em comando para");
-                    }  PVIRG {printf ("; ");} ExprAux4
+                    	opndaux.tipo = ROTOPND;
+            	        $<quad>$ = GeraQuadrupla (OPJF, $11.opnd, opndidle, opndaux);
+                    }  PVIRG {
+                        printf ("; ");
+                        $<quad>$ = GeraQuadrupla (NOP, opndidle, opndidle, opndidle);
+                        } ExprAux4
                     {
                         if ($15.tipo != INTEGER && $15.tipo != CHAR)
                             Incompatibilidade ("Expressao do tipo nao inteira e nao caractere em comando para");
-                    }  FPAR {printf (") ");} Comando
+                    }  FPAR {printf (") ");}
+                        {$<quad>$ = quadcorrente;}
+                        {$<quad>$ = GeraQuadrupla (NOP, opndidle, opndidle, opndidle);} 
+                        Comando {
+                            quadaux = quadcorrente;
+	                        opndaux.tipo = ROTOPND;  opndaux.atr.rotulo = $<quad>10;
+	                        quadaux2 = GeraQuadrupla (OPJUMP, opndidle, opndidle, opndaux);
+	                        $<quad>12->result.atr.rotulo = GeraQuadrupla(NOP, opndidle, opndidle, opndidle);
+                            $<quad>12->prox = $<quad>20;
+                            quadaux->prox = $<quad>14;
+                            $<quad>19->prox = quadaux2;
+                            RenumQuadruplas ($<quad>12, quadcorrente);
+                        }
                 ;
 CmdLer   	    :   LER  ABPAR  {printf ("ler ( ");}  ListLeit  {
                         opnd1.tipo = INTOPND;
