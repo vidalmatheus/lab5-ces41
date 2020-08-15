@@ -22,19 +22,19 @@
 /*   Definicao dos tipos de identificadores   */
 
 #define IDPROG		  1
-#define IDVAR		    2
+#define IDVAR		  2
 #define IDFUNC		  3
 #define IDPROC		  4
 #define IDGLOB		  5
-#define IDPRINCIPAL 6
+#define IDPRINCIPAL   6
 
 /*  Definicao dos tipos de variaveis   */
 
 #define 	NOTVAR		0
 #define 	INTEGER		1
 #define 	LOGICAL		2
-#define 	FLOAT		  3
-#define 	CHAR		  4
+#define 	FLOAT		3
+#define 	CHAR		4
 
 /* Definicao de constantes para os operadores de quadruplas */
 
@@ -42,45 +42,45 @@
 #define		OPAND	 		2
 #define 	OPLT	 		3
 #define 	OPLE	 		4
-#define		OPGT		  5
+#define		OPGT		    5
 #define		OPGE			6
 #define		OPEQ			7
 #define		OPNE			8
-#define		OPMAIS		9
-#define		OPMENOS		10
-#define		OPMULTIP	11
-#define		OPDIV			12
-#define		OPRESTO		13
-#define		OPMENUN		14
-#define		OPNOT			15
-#define		OPATRIB		16
-#define		OPENMOD		17
-#define		NOP			  18
-#define		OPJUMP		19
-#define		OPJF			20
-#define   PARAM     21
-#define   OPREAD    22
-#define   OPWRITE   23
-#define		OPEXIT		24
+#define		OPMAIS		    9
+#define		OPMENOS		   10
+#define		OPMULTIP	   11
+#define		OPDIV		   12
+#define		OPRESTO		   13
+#define		OPMENUN		   14
+#define		OPNOT		   15
+#define		OPATRIB		   16
+#define		OPENMOD		   17
+#define		NOP			   18
+#define		OPJUMP		   19
+#define		OPJF		   20
+#define     PARAM          21
+#define     OPREAD         22
+#define     OPWRITE        23
+#define		OPEXIT		   24
 
 /* Definicao de constantes para os tipos de operandos de quadruplas */
 
 #define		IDLEOPND		0
-#define		VAROPND		  1
-#define		INTOPND		  2
+#define		VAROPND		    1
+#define		INTOPND		    2
 #define		REALOPND		3
 #define		CHAROPND		4
-#define		LOGICOPND	  5
-#define		CADOPND		  6
-#define		ROTOPND		  7
-#define		MODOPND		  8
+#define		LOGICOPND	    5
+#define		CADOPND		    6
+#define		ROTOPND		    7
+#define		MODOPND		    8
 
 /*   Definicao de outras constantes   */
 
-#define	NCLASSHASH	23
+#define	NCLASSHASH	    23
 #define	TRUE		     1
 #define	FALSE		     0
-#define MAXDIMS		  10
+#define MAXDIMS		    10
 
 /*  Strings para nomes dos tipos de identificadores  */
 
@@ -120,7 +120,10 @@ struct celsimb {
 	char *cadeia;
 	int tid, tvar, tparam, ndims, dims[MAXDIMS+1], nparams;
 	char inic, ref, array, parametro;
-  listsimb listparam;
+    listsimb listparam;
+	int *valint;
+	float *valfloat;
+  	char *valchar, *vallogic;
 	simbolo escopo, prox;
 };
 
@@ -244,7 +247,7 @@ struct infovariavel {
 	simbolo simb;
 	int tipoexpr;
 	int nsubscr;
-  listsimb listparam;
+    listsimb listparam;
 	infoexpressao infoexpr;
 	infovariavel infovar;
 	int nargs;
@@ -253,11 +256,12 @@ struct infovariavel {
 
 /* Declaracao dos atributos dos tokens e dos nao-terminais */
 
-%type	    <infovar>	      Variavel
-%type 	  <infoexpr> 	    Expressao  ExprAux1  ExprAux2
-                          ExprAux3   ExprAux4   Termo   Fator
-%type 		<nsubscr>		    Subscritos 	ListSubscr
-%type     <nargs>         ListLeit		ListEscr
+%type	    <infovar>	    Variavel
+%type 	    <infoexpr> 	    Expressao  ExprAux1  ExprAux2
+                            ExprAux3   ExprAux4   Termo   Fator
+%type 		<nsubscr>		Subscritos 	ListSubscr
+%type       <nargs>         ListLeit	ListEscr
+%type       <params>        ListParam
 %token		<cadeia>		ID
 %token		<carac>		    CTCARAC
 %token		<cadeia>		CADEIA
@@ -468,24 +472,24 @@ CmdRepetir  	:   REPETIR {printf ("repetir ");} Comando
                 ;
 CmdPara	    	:   PARA  {printf ("para ");}  Variavel
                     {
-                        if  ($3 != NULL){
-                            $3->inic = $3->ref = TRUE;
-                            if ($3->tvar != INTEGER && $3->tvar != CHAR)
+                        if  ($3.simb != NULL){
+                            $3.simb->inic = $3.simb->ref = TRUE;
+                            if ($3.simb->tvar != INTEGER && $3.simb->tvar != CHAR)
                                 Esperado ("Valor interiro ou caractere");
                         }
                     }
                     ABPAR {printf ("( ");} ExprAux4
                     {
-                        if ($7 != INTEGER && $7 != CHAR)
+                        if ($7.tipo != INTEGER && $7.tipo != CHAR)
                             Incompatibilidade ("Expressao do tipo nao inteira e nao caractere em comando para");
                     }
                     PVIRG {printf ("; ");} Expressao
                     {
-                        if ($11 != LOGICAL)
+                        if ($11.tipo != LOGICAL)
                             Incompatibilidade ("Expressao do tipo nao logica em comando para");
                     }  PVIRG {printf ("; ");} ExprAux4
                     {
-                        if ($15 != INTEGER && $15 != CHAR)
+                        if ($15.tipo != INTEGER && $15.tipo != CHAR)
                             Incompatibilidade ("Expressao do tipo nao inteira e nao caractere em comando para");
                     }  FPAR {printf (") ");} Comando
                 ;
@@ -539,7 +543,7 @@ CmdRetornar  	:	RETORNAR  PVIRG {printf ("retornar ; ");}
                     {
                         if (escopo->tid == IDPROC)
                             NaoEsperado("Retorno de variavel para procedimento");
-                        if (escopo->tvar != $3 && ($3 >= 1 && $3 <= 4))
+                        if (escopo->tvar != $3.tipo && ($3.tipo >= 1 && $3.tipo <= 4))
                             Incompatibilidade("Tipo de valor retornado");
                     }  PVIRG  {printf (";\n");}
                 ;
@@ -564,21 +568,21 @@ Expressao     	:   ExprAux1
 				|   Expressao  OR  {printf ("|| ");}  ExprAux1  {
                         if ($1.tipo != LOGICAL || $4.tipo != LOGICAL)
                             Incompatibilidade ("Operando improprio para operador or");
-                        $$ = LOGICAL;
+                        $$.tipo = LOGICAL;
                     }
                 ;
 ExprAux1    	:   ExprAux2
 				|   ExprAux1  AND  {printf ("&& ");}  ExprAux2  {
-                        if ($1 != LOGICAL || $4 != LOGICAL)
+                        if ($1.tipo != LOGICAL || $4.tipo != LOGICAL)
                             Incompatibilidade ("Operando improprio para operador and");
-                        $$ = LOGICAL;
+                        $$.tipo = LOGICAL;
                     }
                 ;
 ExprAux2    	:   ExprAux3
 				|   NOT  {printf ("! ");}  ExprAux3  {
-                        if ($3 != LOGICAL)
+                        if ($3.tipo != LOGICAL)
                             Incompatibilidade ("Operando improprio para operador not");
-                        $$ = LOGICAL;
+                        $$.tipo = LOGICAL;
                     }
                 ;
 ExprAux3    	:   ExprAux4
@@ -594,15 +598,15 @@ ExprAux3    	:   ExprAux4
                     }  ExprAux4  {
                         switch ($2) {
                             case LT: case LE: case GT: case GE:
-                                if ($1 != INTEGER && $1 != FLOAT && $1 != CHAR || $4 != INTEGER && $4 != FLOAT && $4 != CHAR)
+                                if ($1.tipo != INTEGER && $1.tipo != FLOAT && $1.tipo != CHAR || $4.tipo != INTEGER && $4.tipo != FLOAT && $4.tipo != CHAR)
                                     Incompatibilidade	("Operando improprio para operador relacional");
                                 break;
                             case EQ: case NE:
-                                if (($1 == LOGICAL || $4 == LOGICAL) && $1 != $4)
+                                if (($1.tipo == LOGICAL || $4.tipo == LOGICAL) && $1.tipo != $4.tipo)
                                     Incompatibilidade ("Operando improprio para operador relacional");
                                 break;
                         }
-                        $$ = LOGICAL;
+                        $$.tipo = LOGICAL;
                     }
                 ;
 ExprAux4    	:   Termo
@@ -612,10 +616,10 @@ ExprAux4    	:   Termo
                             case MENOS: printf ("- "); break;
                         }
                     }  Termo  {
-                        if ($1 != INTEGER && $1 != FLOAT && $1 != CHAR || $4 != INTEGER && $4!=FLOAT && $4!=CHAR)
+                        if ($1.tipo != INTEGER && $1.tipo != FLOAT && $1.tipo != CHAR || $4.tipo != INTEGER && $4.tipo != FLOAT && $4.tipo != CHAR)
                             Incompatibilidade ("Operando improprio para operador aritmetico");
-                        if ($1 == FLOAT || $4 == FLOAT) $$ = FLOAT;
-                        else $$ = INTEGER;
+                        if ($1.tipo == FLOAT || $4.tipo == FLOAT) $$.tipo = FLOAT;
+                        else $$.tipo = INTEGER;
                     }
                 ;
 Termo  	    	:   Fator
@@ -628,45 +632,45 @@ Termo  	    	:   Fator
                     }  Fator  {
                         switch ($2) {
                             case MULT: case DIV:
-                                if ($1 != INTEGER && $1 != FLOAT && $1 != CHAR
-                                    || $4 != INTEGER && $4!=FLOAT && $4!=CHAR)
+                                if ($1.tipo != INTEGER && $1.tipo != FLOAT && $1.tipo != CHAR
+                                    || $4.tipo != INTEGER && $4.tipo != FLOAT && $4.tipo != CHAR)
                                     Incompatibilidade ("Operando improprio para operador aritmetico");
-                                if ($1 == FLOAT || $4 == FLOAT) $$ = FLOAT;
-                                else $$ = INTEGER;
+                                if ($1.tipo == FLOAT || $4.tipo == FLOAT) $$.tipo = FLOAT;
+                                else $$.tipo = INTEGER;
                                 break;
                             case RESTO:
-                                if ($1 != INTEGER && $1 != CHAR
-                                    ||  $4 != INTEGER && $4 != CHAR)
+                                if ($1.tipo != INTEGER && $1.tipo != CHAR
+                                    ||  $4.tipo != INTEGER && $4.tipo != CHAR)
                                     Incompatibilidade ("Operando improprio para operador resto");
-                                $$ = INTEGER;
+                                $$.tipo = INTEGER;
                                 break;
                         }
                     }
                 ;
 Fator		    :   Variavel  {
-                        if  ($1 != NULL) {
-                            $1->ref  =  TRUE;
-                            $$ = $1->tvar;
+                        if  ($1.simb != NULL) {
+                            $1.simb->ref  =  TRUE;
+                            $$.tipo = $1.simb->tvar;
                         }
                     }
-                |   CTINT  {printf ("%d ", $1); $$ = INTEGER;
+                |   CTINT  {printf ("%d ", $1); $$.tipo = INTEGER;
  							    if(indexada == TRUE && $1 <= 0){
                                     Esperado("Valor inteiro positivo");
                                 }
                             }
-                |   CTREAL  {printf ("%g ", $1); $$ = FLOAT;}
-                |   CTCARAC  {printf ("\'%c\' ", $1); $$ = CHAR;}
-            	|   VERDADE  {printf ("verdade "); $$ = LOGICAL;}
-            	|   FALSO  {printf ("falso "); $$ = LOGICAL;}
+                |   CTREAL  {printf ("%g ", $1); $$.tipo = FLOAT;}
+                |   CTCARAC  {printf ("\'%c\' ", $1); $$.tipo = CHAR;}
+            	|   VERDADE  {printf ("verdade "); $$.tipo = LOGICAL;}
+            	|   FALSO  {printf ("falso "); $$.tipo = LOGICAL;}
             	|   NEG  {printf ("~ ");}  Fator  {
-                        if ($3 != INTEGER &&
-                            $3 != FLOAT && $3 != CHAR)
+                        if ($3.tipo != INTEGER &&
+                            $3.tipo != FLOAT && $3.tipo != CHAR)
                             Incompatibilidade  ("Operando improprio para menos unario");
-                            if ($3 == FLOAT) $$ = FLOAT;
-                            else $$ = INTEGER;
+                            if ($3.tipo == FLOAT) $$.tipo = FLOAT;
+                            else $$.tipo = INTEGER;
                     }
             	|   ABPAR  {printf ("( ");}  Expressao  FPAR
-                    {printf (") "); $$ = $3;}
+                    {printf (") "); $$.tipo = $3.tipo;}
                 |   ChamadaFunc
                 ;
 
@@ -688,13 +692,13 @@ Variavel		:   ID  {
                             addToList(&listargs,simb->tvar,simb->tid);
                     }
 					Subscritos  {
-						$$ = $<simb>2;
-                        if ($$!= NULL) {
-                            if ($$->array == FALSE && $3 > 0)
+						$$.simb = $<simb>2;
+                        if ($$.simb != NULL) {
+                            if ($$.simb->array == FALSE && $3 > 0)
                                 NaoEsperado ("Subscrito\(s)");
-                            else if ($$->array == TRUE && $3 == 0)
+                            else if ($$.simb->array == TRUE && $3 == 0)
                                 Esperado ("Subscrito\(s)");
-                            else if ($$->ndims != $3)
+                            else if ($$.simb->ndims != $3)
                                 Incompatibilidade ("Numero de subscritos incompativel com declaracao");
                         }
 					}
@@ -709,13 +713,13 @@ Subscritos      :	{$$ = 0;}
                 ;
 ListSubscr  	:   ExprAux4
 					{
-						if ($1 != INTEGER && $1 != CHAR)
+						if ($1.tipo != INTEGER && $1.tipo != CHAR)
 							Incompatibilidade ("Tipo inadequado para subscrito");
 						$$ = 1;
 					}
                 |   ListSubscr  VIRG  {printf (", ");}  ExprAux4
 					{
-						if ($4 != INTEGER && $4 != CHAR)
+						if ($4.tipo != INTEGER && $4.tipo != CHAR)
 							Incompatibilidade ("Tipo inadequado para subscrito");
 						$$ = $1 + 1;
 						if($$ > MAXDIMS)
