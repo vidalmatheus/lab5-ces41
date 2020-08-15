@@ -9,12 +9,12 @@ programa HelloWorld {{{
    }
    comandos {
         escrever("Hello World!");
-        mat[3,4] = 10;
+        /*mat[3,4] = 10;*/
         n = 15;
         ler(c);
         booleana = falso;
 
-        se (booleana) word[2] = 'a';
+        se (booleana) c = 'a';
         senao numero = 2.5;
 
         i = 5;
