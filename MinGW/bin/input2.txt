@@ -1,5 +1,12 @@
 programa CalculaFatorial {{{
 
+    procedimento Hello (carac nome)
+    comandos {
+            escrever ("Hello, ", nome); 
+            retornar;
+    } /* fim do procedimento Hello */
+
+
     funcao int fatorial (int n)
     var {int (i,prod)}
     comandos {
@@ -15,7 +22,7 @@ programa CalculaFatorial {{{
     comandos {
         escrever ("Numero: ");
         ler(n);
-        n = fatorial(n);
+        /*n = fatorial(n);*/
         /*escrever ("Fatorial de ", n, " ", fatorial(n));*/
     }
 }}}

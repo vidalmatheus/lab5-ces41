@@ -62,6 +62,8 @@
 #define     OPREAD         22
 #define     OPWRITE        23
 #define		OPEXIT		   24
+#define     OPCALL         25
+#define     OPRETURN       26
 
 /* Definicao de constantes para os tipos de operandos de quadruplas */
 
@@ -74,6 +76,8 @@
 #define		CADOPND		    6
 #define		ROTOPND		    7
 #define		MODOPND		    8
+#define     FUNCOPND        9
+#define     PROCOPND       10
 
 /*   Definicao de outras constantes   */
 
@@ -94,19 +98,19 @@ char *nometipvar[5] = {"NOTVAR",
 
 /* Strings para operadores de quadruplas */
 
-char *nomeoperquad[25] = {"",
+char *nomeoperquad[27] = {"",
 	"OR", "AND", "LT", "LE", "GT", "GE", "EQ", "NE", "MAIS",
 	"MENOS", "MULT", "DIV", "RESTO", "MENUN", "NOT", "ATRIB",
 	"OPENMOD", "NOP", "JUMP", "JF", "PARAM", "READ", "WRITE",
-	"EXIT"
+	"EXIT", "OPCALL", "OPRETURN"
 };
 
 /*
 	Strings para tipos de operandos de quadruplas
  */
 
-char *nometipoopndquad[9] = {"IDLE",
-	"VAR", "INT", "REAL", "CARAC", "LOGIC", "CADEIA", "ROTULO", "MODULO"
+char *nometipoopndquad[11] = {"IDLE",
+	"VAR", "INT", "REAL", "CARAC", "LOGIC", "CADEIA", "ROTULO", "MODULO", "FUNCAO", "PROCEDIMENTO"
 };
 
 /*    Declaracoes para a tabela de simbolos     */
@@ -256,7 +260,7 @@ struct infovariavel {
 
 /* Declaracao dos atributos dos tokens e dos nao-terminais */
 
-%type	    <infovar>	    Variavel
+%type	    <infovar>	    Variavel   ChamadaFunc  ChamadaProc
 %type 	    <infoexpr> 	    Expressao  ExprAux1  ExprAux2
                             ExprAux3   ExprAux4   Termo   Fator
                             ElemEscr
@@ -390,7 +394,9 @@ ListMod 	    :
                 |   ListMod  Modulo
                 ;
 
-Modulo        	:	Cabecalho  Corpo {escopo = escopo->escopo;}
+Modulo        	:	Cabecalho  Corpo {
+                        escopo = escopo->escopo;
+                        }
                 ;
 
 Cabecalho     	:   CabFunc
@@ -405,8 +411,13 @@ CabFunc	    	:   FUNCAO {printf ("funcao ");} Tipo
                             NaoEsperado("Outro modulo de cabecalho principal");
                         else if  (ProcuraSimb ($4, escopo)  !=  NULL)
                             DeclaracaoRepetida ($4, escopo);
-                        else
+                        else {
                             escopo = InsereSimb ($4,  IDFUNC,  tipocorrente, escopo);
+                            InicCodIntermMod (escopo);
+                            opnd1.tipo = FUNCOPND;
+                            opnd1.atr.modulo = modcorrente;
+                            GeraQuadrupla(OPENMOD, opnd1, opndidle, opndidle);
+                        }
                     }  ABPAR  {printf ("( ");}  ListParam
                     FPAR  {printf (") ");}
                 ;
@@ -419,8 +430,13 @@ CabProc	    	:   PROCEDIMENTO {printf ("procedimento ");}
                             NaoEsperado("Outro modulo de cabecalho principal");
                         else if  (ProcuraSimb ($3, escopo)  !=  NULL)
                             DeclaracaoRepetida ($3, escopo);
-                        else
+                        else {
                             escopo = InsereSimb ($3,  IDPROC,  tipocorrente, escopo);
+                            InicCodIntermMod (escopo);
+                            opnd1.tipo = PROCOPND;
+                            opnd1.atr.modulo = modcorrente;
+                            GeraQuadrupla(OPENMOD, opnd1, opndidle, opndidle);
+                        }
                     }  ABPAR  {printf ("( ");}  ListParam
                     FPAR  {printf (")\n");}
                 ;
@@ -447,7 +463,14 @@ Parametro   	:
                 ;
 Corpo     	    :   Decls  Comandos
                 ;
-ModPrincipal  	:   PRINCIPAL {escopo = InsereSimb ("##principal", IDPRINCIPAL, tipocorrente, escopoGlobal);} {printf ("principal\n");}  Corpo
+ModPrincipal  	:   PRINCIPAL {
+                        escopo = InsereSimb ("##principal", IDPRINCIPAL, tipocorrente, escopoGlobal);
+                        InicCodIntermMod (escopo);
+                        opnd1.tipo = FUNCOPND;
+                        opnd1.atr.modulo = modcorrente;
+                        GeraQuadrupla(OPENMOD, opnd1, opndidle, opndidle);
+                        } 
+                        {printf ("principal\n");}  Corpo
                 ;
 Comandos       	:   COMANDOS  {printf ("comandos ");}  CmdComp
                 ;
@@ -630,7 +653,10 @@ Argumentos    	:  {listargs = NULL;}
                         isParamsOk(listargs, modParams);
                 }
                 ;
-CmdRetornar  	:	RETORNAR  PVIRG {printf ("retornar ; ");}
+CmdRetornar  	:	RETORNAR  PVIRG {
+                        printf ("retornar ; ");
+                      	GeraQuadrupla (OPRETURN, opndidle, opndidle, opndidle);
+                    }
                 {
                     if (escopo->tid == IDFUNC)
                         Esperado("Retorno de variavel para funcao");
@@ -642,6 +668,7 @@ CmdRetornar  	:	RETORNAR  PVIRG {printf ("retornar ; ");}
                             NaoEsperado("Retorno de variavel para procedimento");
                         if (escopo->tvar != $3.tipo && ($3.tipo >= 1 && $3.tipo <= 4))
                             Incompatibilidade("Tipo de valor retornado");
+                        GeraQuadrupla (OPRETURN, $3.opnd, opndidle, opndidle);
                     }  PVIRG  {printf (";\n");}
                 ;
 
@@ -659,8 +686,12 @@ CmdAtrib      	:   Variavel  {if  ($1.simb != NULL) $1.simb->inic = $1.simb->ref
                         }
                     }
                 ;
-ListExpr		:  	Expressao
-                |   ListExpr  VIRG  {printf (", ");}  Expressao
+ListExpr		:  	Expressao {
+                        GeraQuadrupla (PARAM, $1.opnd, opndidle, opndidle);
+                    }
+                |   ListExpr  VIRG  {printf (", ");}  Expressao {
+                        GeraQuadrupla (PARAM, $4.opnd, opndidle, opndidle);
+                    }
                 ;
 Expressao     	:   ExprAux1
 				|   Expressao  OR  {printf ("|| ");}  ExprAux1  {
@@ -835,7 +866,13 @@ Fator		    :   Variavel  {
                     }
             	|   ABPAR  {printf ("( ");}  Expressao  FPAR
                     {printf (") "); $$.tipo = $3.tipo; $$.opnd = $3.opnd;}
-                |   ChamadaFunc
+                |   ChamadaFunc {
+                        if ($1.simb != NULL) {
+                            $$.tipo = $1.simb->tvar;
+                            $$.opnd = $1.opnd;
+                        }
+                    }
+
                 ;
 
 Variavel		:   ID  {
@@ -901,7 +938,18 @@ ChamadaFunc     :   ID  {
                         simb = ProcuraSimb ($1, escopoGlobal);
                         if (simb == NULL)   NaoDeclarado ($1, escopo);
                         else if (simb->tid != IDFUNC)   TipoInadequado ($1);
-                        else modParams = simb->listparam;
+                        else {
+                            modParams = simb->listparam;
+                            $$.simb = simb;
+                            opnd1.tipo = FUNCOPND;  
+                            opnd1.atr.modulo->modname = escopo;
+                            opnd2.tipo = INTOPND; opnd2.atr.valint = simb->nparams;
+                            if ($$.simb->tvar == NOTVAR) result = opndidle;
+                            else { result.tipo = VAROPND;
+                                result.atr.simb = NovaTemp ($$.simb->tvar, escopo); } 	
+                            GeraQuadrupla (OPCALL, opnd1, opnd2, result);
+                            $$.opnd = result;
+                        }
                         $<simb>$ = simb;
                     }  ABPAR  {printf ("(");} Argumentos FPAR  {printf (") ");}
 %%
@@ -1140,7 +1188,9 @@ void ImprimeQuadruplas () {
 				case LOGICOPND: printf (", %d", q->opnd1.atr.vallogic); break;
 				case CADOPND: printf (", %s", q->opnd1.atr.valcad); break;
 				case ROTOPND: printf (", %d", q->opnd1.atr.rotulo->num); break;
-				case MODOPND: printf(", %s", q->opnd1.atr.modulo->modname->cadeia);
+				case MODOPND: printf(", %s", q->opnd1.atr.modulo->modname->cadeia); break;
+                case FUNCOPND: printf(", %s", q->opnd1.atr.modulo->modname->cadeia); break;
+                case PROCOPND: printf(", %s", q->opnd1.atr.modulo->modname->cadeia);
 					break;
 			}
 			printf (")");
