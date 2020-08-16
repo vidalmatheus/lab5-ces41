@@ -7,7 +7,7 @@ programa CalculaFatorial {{{
     } /* fim do procedimento Hello */
 
 
-    funcao int fatorial (int n, int j)
+    funcao int fatorial (int n)
     var {int (i,prod)}
     comandos {
         prod = 1;
@@ -27,6 +27,6 @@ programa CalculaFatorial {{{
         ler(n);
         n = fatorial(n);
         chamar Hello(letra);
-        /*escrever ("Fatorial de ", n, " ", fatorial(n));*/
+        escrever ("Fatorial de ", n, " ", fatorial(n));
     }
 }}}
