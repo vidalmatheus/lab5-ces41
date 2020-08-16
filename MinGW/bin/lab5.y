@@ -141,9 +141,9 @@ struct elemlistsimb {
 /*  Variaveis globais para a tabela de simbolos e analise semantica */
 
 simbolo tabsimb[NCLASSHASH];
-simbolo simb;
+simbolo simb, simb2;
 int tipocorrente;
-int nparams_call;
+int nparams_dec;
 simbolo escopo, escopoGlobal;
 listsimb modParams;
 listsimb listargs;
@@ -318,11 +318,11 @@ struct infovariavel {
 	Os terminais sao escritos e, depois de alguns,
 	para alguma estetica, ha mudanca de linha       */
 
-Prog			:	{InicTabSimb (); InicCodIntermed (); numtemp = 0; indexada = FALSE;}  
-                    PROGRAMA  ID 
+Prog			:	{InicTabSimb (); InicCodIntermed (); numtemp = 0; indexada = FALSE;}
+                    PROGRAMA  ID
                     {escopo = escopoGlobal = InsereSimb ("##global", IDGLOB, NOTVAR, NULL);} ABTRIP
                     {
-                        printf ("programa %s {{{\n", $3); 
+                        printf ("programa %s {{{\n", $3);
                         simb = InsereSimb ($3, IDPROG, NOTVAR, escopo);
                         InicCodIntermMod (simb);
                         opnd1.tipo = MODOPND;
@@ -418,8 +418,8 @@ CabFunc	    	:   FUNCAO {printf ("funcao ");} Tipo
                             opnd1.atr.modulo = modcorrente;
                             GeraQuadrupla(OPENMOD, opnd1, opndidle, opndidle);
                         }
-                    }  ABPAR  {printf ("( ");}  ListParam
-                    FPAR  {printf (") ");}
+                    }  ABPAR  {printf ("( "); nparams_dec = 0;}  ListParam
+                    FPAR  {printf (")\n"); escopo->nparams = nparams_dec;}
                 ;
 
 CabProc	    	:   PROCEDIMENTO {printf ("procedimento ");}
@@ -437,12 +437,12 @@ CabProc	    	:   PROCEDIMENTO {printf ("procedimento ");}
                             opnd1.atr.modulo = modcorrente;
                             GeraQuadrupla(OPENMOD, opnd1, opndidle, opndidle);
                         }
-                    }  ABPAR  {printf ("( ");}  ListParam
-                    FPAR  {printf (")\n");}
+                    }  ABPAR  {printf ("( "); nparams_dec = 0;}  ListParam
+                    FPAR  {printf (")\n"); escopo->nparams = nparams_dec;}
                 ;
 
-ListParam   	: 	Parametro
-                |   ListParam  VIRG {printf (", ");} Parametro
+ListParam   	: 	Parametro {nparams_dec +=1;}
+                |   ListParam  VIRG {printf (", "); nparams_dec +=1;} Parametro
 
 Parametro   	:
 				|	Tipo
@@ -469,13 +469,18 @@ ModPrincipal  	:   PRINCIPAL {
                         opnd1.tipo = FUNCOPND;
                         opnd1.atr.modulo = modcorrente;
                         GeraQuadrupla(OPENMOD, opnd1, opndidle, opndidle);
-                        } 
+                        }
                         {printf ("principal\n");}  Corpo
                 ;
 Comandos       	:   COMANDOS  {printf ("comandos ");}  CmdComp
                 ;
 CmdComp 		:   ABCHAV  {printf ("{\n");}  ListCmd  FCHAV
-                    {printf ("}\n");}
+                    {
+											printf ("}\n");
+											if (quadcorrente->oper != OPRETURN) {
+	    										GeraQuadrupla (OPRETURN, opndidle, opndidle, opndidle);
+											}
+										}
                 ;
 ListCmd 		:
                 |   ListCmd  Comando
@@ -505,7 +510,7 @@ CmdSe		    :   SE    ABPAR  {printf ("se ( ");}  Expressao  {
                 ;
 CmdSenao		:
                 |   SENAO  {
-                        printf ("senao\n"); 
+                        printf ("senao\n");
                         opndaux.tipo = ROTOPND;
                         $<quad>$ = GeraQuadrupla (OPJUMP, opndidle, opndidle, opndaux);
                     } Comando {
@@ -528,7 +533,7 @@ CmdEnquanto   	:	ENQUANTO  ABPAR  {
                     }
                 ;
 CmdRepetir  	:   REPETIR {
-                        printf ("repetir "); 
+                        printf ("repetir ");
                         $<quad>$ = GeraQuadrupla (NOP, opndidle, opndidle, opndidle);
                     } Comando
                     ENQUANTO  ABPAR {printf ("enquanto ( ");}  Expressao  {
@@ -572,7 +577,7 @@ CmdPara	    	:   PARA  {printf ("para ");}  Variavel
                             Incompatibilidade ("Expressao do tipo nao inteira e nao caractere em comando para");
                     }  FPAR {printf (") ");}
                         {$<quad>$ = quadcorrente;}
-                        {$<quad>$ = GeraQuadrupla (NOP, opndidle, opndidle, opndidle);} 
+                        {$<quad>$ = GeraQuadrupla (NOP, opndidle, opndidle, opndidle);}
                         Comando {
                             quadaux = quadcorrente;
 	                        opndaux.tipo = ROTOPND;  opndaux.atr.rotulo = $<quad>10;
@@ -592,13 +597,13 @@ CmdLer   	    :   LER  ABPAR  {printf ("ler ( ");}  ListLeit  {
                     {printf (") ;\n");}
                 ;
 ListLeit		:   Variavel {
-                        if  ($1.simb != NULL) 
-                            $1.simb->inic = $1.simb->ref = TRUE; 
+                        if  ($1.simb != NULL)
+                            $1.simb->inic = $1.simb->ref = TRUE;
                         $$ = 1;
                         GeraQuadrupla (PARAM, $1.opnd, opndidle, opndidle);
                     }
 					|  ListLeit  VIRG  {printf (", ");} Variavel {
-                        if  ($4.simb != NULL) 
+                        if  ($4.simb != NULL)
                             $4.simb->inic = $4.simb->ref = TRUE;
                         $$ = $1 + 1;
                         GeraQuadrupla (PARAM, $4.opnd, opndidle, opndidle);
@@ -634,13 +639,33 @@ ChamadaProc   	:	CHAMAR  ID {printf ("chamar %s ", $2);}
                         if (strcmp($2,escopo->cadeia) == 0)
                             NaoEsperado("Recursao nao e possivel nesta linguagem");
                         simb = ProcuraSimb ($2, escopoGlobal);
+												simb2 = simb;
                         if (simb == NULL)   NaoDeclarado ($2, escopo);
                         else if (simb->tid != IDPROC)   TipoInadequado ($2);
                         else modParams = simb->listparam;
                         $<simb>$ = simb;
                     }
                     ABPAR  {printf ("(");} Argumentos
-                    FPAR  PVIRG  {printf (") ;\n");}
+                    FPAR  PVIRG
+										{
+											printf (") ;\n");
+											$$.simb = simb2;
+
+											opnd1.tipo = PROCOPND;
+											opnd1.atr.modulo = modcorrente;
+
+											opnd1.atr.modulo->modname = simb2;
+		
+											opnd2.tipo = INTOPND;
+											opnd2.atr.valint = simb2->nparams;
+											if ($$.simb->tvar == NOTVAR) result = opndidle;
+											else {
+												result.tipo = VAROPND;
+												result.atr.simb = NovaTemp ($$.simb->tvar, escopo);
+											}
+											GeraQuadrupla (OPCALL, opnd1, opnd2, result);
+											$$.opnd = result;
+										}
                 ;
 Argumentos    	:  {listargs = NULL;}
                 {
@@ -661,7 +686,7 @@ CmdRetornar  	:	RETORNAR  PVIRG {
                     if (escopo->tid == IDFUNC)
                         Esperado("Retorno de variavel para funcao");
                 }
-				|   RETORNAR  {printf ("retornar ");}
+								|   RETORNAR  {printf ("retornar ");}
                     Expressao
                     {
                         if (escopo->tid == IDPROC)
@@ -834,7 +859,7 @@ Fator		    :   Variavel  {
                                     Esperado("Valor inteiro positivo");
                                 }
                             }
-                |   CTREAL  {   
+                |   CTREAL  {
                                 printf ("%g ", $1); $$.tipo = FLOAT;
                                 $$.opnd.tipo = REALOPND;
                                 $$.opnd.atr.valfloat = $1;
@@ -866,7 +891,7 @@ Fator		    :   Variavel  {
                     }
             	|   ABPAR  {printf ("( ");}  Expressao  FPAR
                     {printf (") "); $$.tipo = $3.tipo; $$.opnd = $3.opnd;}
-                |   ChamadaFunc {
+              |   ChamadaFunc {
                         if ($1.simb != NULL) {
                             $$.tipo = $1.simb->tvar;
                             $$.opnd = $1.opnd;
@@ -930,28 +955,46 @@ ListSubscr  	:   ExprAux4
 							Incompatibilidade ("Ultrapassou o maximo de dimensoes");
 					}
                 ;
-ChamadaFunc     :   ID  {
-                        modParams = NULL;
-                        printf ("%s ", $1);
-                        if (strcmp($1,escopo->cadeia) == 0)
-                            NaoEsperado("Recursao nao e possivel nesta linguagem");
-                        simb = ProcuraSimb ($1, escopoGlobal);
-                        if (simb == NULL)   NaoDeclarado ($1, escopo);
-                        else if (simb->tid != IDFUNC)   TipoInadequado ($1);
-                        else {
-                            modParams = simb->listparam;
-                            $$.simb = simb;
-                            opnd1.tipo = FUNCOPND;  
-                            opnd1.atr.modulo->modname = escopo;
-                            opnd2.tipo = INTOPND; opnd2.atr.valint = simb->nparams;
-                            if ($$.simb->tvar == NOTVAR) result = opndidle;
-                            else { result.tipo = VAROPND;
-                                result.atr.simb = NovaTemp ($$.simb->tvar, escopo); } 	
-                            GeraQuadrupla (OPCALL, opnd1, opnd2, result);
-                            $$.opnd = result;
-                        }
-                        $<simb>$ = simb;
-                    }  ABPAR  {printf ("(");} Argumentos FPAR  {printf (") ");}
+ChamadaFunc   :   ID  {
+		                      modParams = NULL;
+								          printf ("%s ", $1);
+								          if (strcmp($1,escopo->cadeia) == 0){
+								          		NaoEsperado("Recursao nao e possivel nesta linguagem");
+													}
+													simb = ProcuraSimb ($1, escopoGlobal);
+													simb2 = simb;
+								          if (simb == NULL){
+														NaoDeclarado ($1, escopo);
+													}
+													else if (simb->tid != IDFUNC){
+															TipoInadequado ($1);
+												  }
+								          else {
+														modParams = simb->listparam;
+													}
+								          $<simb>$ = simb;
+							 }  ABPAR  {printf ("(");} Argumentos FPAR
+							 {
+							 		printf (") ");
+
+									$$.simb = simb2;
+
+									opnd1.tipo = FUNCOPND;
+									opnd1.atr.modulo = modcorrente;
+
+									opnd1.atr.modulo->modname = simb2;
+
+									opnd2.tipo = INTOPND;
+									opnd2.atr.valint = simb2->nparams;
+									if ($$.simb->tvar == NOTVAR) result = opndidle;
+									else {
+										result.tipo = VAROPND;
+										result.atr.simb = NovaTemp ($$.simb->tvar, escopo);
+									}
+									GeraQuadrupla (OPCALL, opnd1, opnd2, result);
+									$$.opnd = result;
+							 }
+
 %%
 
 /* Inclusao do analisador lexico  */
@@ -995,6 +1038,7 @@ simbolo InsereSimb (char *cadeia, int tid, int tvar, simbolo escopo) {
 	s->cadeia = (char*) malloc ((strlen(cadeia)+1) * sizeof(char));
 	strcpy (s->cadeia, cadeia);
     s->ndims = 0;
+		s->nparams = 0;
     s->listparam = NULL;
 	s->tid = tid;		s->tvar = tvar;
 	s->inic = FALSE;	s->ref = FALSE;
@@ -1189,8 +1233,8 @@ void ImprimeQuadruplas () {
 				case CADOPND: printf (", %s", q->opnd1.atr.valcad); break;
 				case ROTOPND: printf (", %d", q->opnd1.atr.rotulo->num); break;
 				case MODOPND: printf(", %s", q->opnd1.atr.modulo->modname->cadeia); break;
-                case FUNCOPND: printf(", %s", q->opnd1.atr.modulo->modname->cadeia); break;
-                case PROCOPND: printf(", %s", q->opnd1.atr.modulo->modname->cadeia);
+        case FUNCOPND: printf(", %s", q->opnd1.atr.modulo->modname->cadeia); break;
+        case PROCOPND: printf(", %s", q->opnd1.atr.modulo->modname->cadeia);
 					break;
 			}
 			printf (")");
