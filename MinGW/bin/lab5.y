@@ -64,6 +64,8 @@
 #define		OPEXIT		   24
 #define     OPCALL         25
 #define     OPRETURN       26
+#define     IND            27
+#define     INDEX          28
 
 /* Definicao de constantes para os tipos de operandos de quadruplas */
 
@@ -78,6 +80,7 @@
 #define		MODOPND		    8
 #define     FUNCOPND        9
 #define     PROCOPND       10
+#define     INDEXOPND      11
 
 /*   Definicao de outras constantes   */
 
@@ -98,19 +101,19 @@ char *nometipvar[5] = {"NOTVAR",
 
 /* Strings para operadores de quadruplas */
 
-char *nomeoperquad[27] = {"",
+char *nomeoperquad[29] = {"",
 	"OR", "AND", "LT", "LE", "GT", "GE", "EQ", "NE", "MAIS",
 	"MENOS", "MULT", "DIV", "RESTO", "MENUN", "NOT", "ATRIB",
 	"OPENMOD", "NOP", "JUMP", "JF", "PARAM", "READ", "WRITE",
-	"EXIT", "OPCALL", "OPRETURN"
+	"EXIT", "OPCALL", "OPRETURN", "IND", "INDEX"
 };
 
 /*
 	Strings para tipos de operandos de quadruplas
  */
 
-char *nometipoopndquad[11] = {"IDLE",
-	"VAR", "INT", "REAL", "CARAC", "LOGIC", "CADEIA", "ROTULO", "MODULO", "FUNCAO", "PROCEDIMENTO"
+char *nometipoopndquad[12] = {"IDLE",
+	"VAR", "INT", "REAL", "CARAC", "LOGIC", "CADEIA", "ROTULO", "MODULO", "FUNCAO", "PROCEDIMENTO", "VAR"
 };
 
 /*    Declaracoes para a tabela de simbolos     */
@@ -938,6 +941,16 @@ Variavel		:   ID  {
                             if ($3 == 0)
                                 $$.opnd.atr.simb = $$.simb;
                         }
+                        if ($3 > 0) {
+                            $$.opnd.atr.modulo = malloc (sizeof(celmodhead));
+                            $$.opnd.atr.modulo->modname = $$.simb;
+                            $$.opnd.tipo = INDEXOPND;
+                            opnd2.tipo = INTOPND;
+                            opnd2.atr.valint = $3;
+                            result.tipo = VAROPND;
+                            result.atr.simb = NovaTemp ($$.simb->tvar, escopo);
+                            GeraQuadrupla (INDEX, $$.opnd, opnd2, result);
+                        }
 					}
                 ;
 Subscritos      :	{$$ = 0;}
@@ -953,6 +966,7 @@ ListSubscr  	:   ExprAux4
 						if ($1.tipo != INTEGER && $1.tipo != CHAR)
 							Incompatibilidade ("Tipo inadequado para subscrito");
 						$$ = 1;
+                        GeraQuadrupla (IND, $1.opnd, opndidle, opndidle);
 					}
                 |   ListSubscr  VIRG  {printf (", ");}  ExprAux4
 					{
@@ -961,6 +975,7 @@ ListSubscr  	:   ExprAux4
 						$$ = $1 + 1;
 						if($$ > MAXDIMS)
 							Incompatibilidade ("Ultrapassou o maximo de dimensoes");
+                        GeraQuadrupla (IND, $4.opnd, opndidle, opndidle);
 					}
                 ;
 ChamadaFunc   :   ID  {
@@ -1241,8 +1256,9 @@ void ImprimeQuadruplas () {
 				case CADOPND: printf (", %s", q->opnd1.atr.valcad); break;
 				case ROTOPND: printf (", %d", q->opnd1.atr.rotulo->num); break;
 				case MODOPND: printf(", %s", q->opnd1.atr.modulo->modname->cadeia); break;
-        case FUNCOPND: printf(", %s", q->opnd1.atr.modulo->modname->cadeia); break;
-        case PROCOPND: printf(", %s", q->opnd1.atr.modulo->modname->cadeia);
+                case FUNCOPND: printf(", %s", q->opnd1.atr.modulo->modname->cadeia); break;
+                case PROCOPND: printf(", %s", q->opnd1.atr.modulo->modname->cadeia); break;
+                case INDEXOPND: printf(", %s", q->opnd1.atr.modulo->modname->cadeia);
 					break;
 			}
 			printf (")");
