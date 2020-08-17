@@ -66,6 +66,8 @@
 #define     OPRETURN       26
 #define     IND            27
 #define     INDEX          28
+#define     ATRIBPONT      29
+#define     CONTAPONT      30
 
 /* Definicao de constantes para os tipos de operandos de quadruplas */
 
@@ -81,6 +83,7 @@
 #define     FUNCOPND        9
 #define     PROCOPND       10
 #define     INDEXOPND      11
+
 
 /*   Definicao de outras constantes   */
 
@@ -101,11 +104,11 @@ char *nometipvar[5] = {"NOTVAR",
 
 /* Strings para operadores de quadruplas */
 
-char *nomeoperquad[29] = {"",
+char *nomeoperquad[31] = {"",
 	"OR", "AND", "LT", "LE", "GT", "GE", "EQ", "NE", "MAIS",
 	"MENOS", "MULT", "DIV", "RESTO", "MENUN", "NOT", "ATRIB",
 	"OPENMOD", "NOP", "JUMP", "JF", "PARAM", "READ", "WRITE",
-	"EXIT", "OPCALL", "OPRETURN", "IND", "INDEX"
+	"EXIT", "OPCALL", "OPRETURN", "IND", "INDEX", "ATRIBPONT", "CONTAPONT"
 };
 
 /*
@@ -242,6 +245,11 @@ struct infovariavel {
 	simbolo simb;
 	operando opnd;
 };
+
+
+/* Variaveis globais para a última váriável indexada */
+
+infovariavel lastvarindex;
 
 %}
 
@@ -605,6 +613,10 @@ CmdLer   	    :   LER  ABPAR  {printf ("ler ( ");}  ListLeit  {
                         opnd1.tipo = INTOPND;
                         opnd1.atr.valint = $4;
                         GeraQuadrupla (OPREAD, opnd1, opndidle, opndidle);
+                        if (lastvarindex.simb != NULL){
+                            GeraQuadrupla (ATRIBPONT, lastvarindex.opnd, opndidle, result);
+                        }
+                        lastvarindex.simb = NULL;
                     } FPAR  PVIRG
                     {printf (") ;\n");}
                 ;
@@ -612,12 +624,21 @@ ListLeit		:   Variavel {
                         if  ($1.simb != NULL)
                             $1.simb->inic = $1.simb->ref = TRUE;
                         $$ = 1;
+                        if ($1.simb->ndims > 0){
+                            $1.opnd.tipo = VAROPND;
+                            $1.opnd.atr.simb = NovaTemp ($1.simb->tvar, escopo);
+                            lastvarindex = $1;
+                        }
                         GeraQuadrupla (PARAM, $1.opnd, opndidle, opndidle);
                     }
 					|  ListLeit  VIRG  {printf (", ");} Variavel {
                         if  ($4.simb != NULL)
                             $4.simb->inic = $4.simb->ref = TRUE;
                         $$ = $1 + 1;
+                        if ($4.simb->ndims > 0){
+                            $4.opnd.tipo = VAROPND;
+                            $4.opnd.atr.simb = NovaTemp ($4.simb->tvar, escopo);
+                        }
                         GeraQuadrupla (PARAM, $4.opnd, opndidle, opndidle);
                     }
                 ;
@@ -630,10 +651,15 @@ CmdEscrever   	:	ESCREVER  ABPAR  {printf ("escrever ( ");}  ListEscr {
                 ;
 ListEscr		:	ElemEscr {
                         $$ = 1;
+                        if ($1.opnd.tipo == INDEXOPND){
+                            $1.opnd = result;
+                        }
                         GeraQuadrupla (PARAM, $1.opnd, opndidle, opndidle);
                     }
 				|  ListEscr  VIRG  {printf (", ");}  ElemEscr {
                         $$ = $1 + 1;
+                        if ($4.opnd.tipo == INDEXOPND)
+                            $4.opnd = result;
                         GeraQuadrupla (PARAM, $4.opnd, opndidle, opndidle);
                     }
                 ;
@@ -709,7 +735,16 @@ CmdRetornar  	:	RETORNAR  PVIRG {
                 ;
 
 CmdAtrib      	:   Variavel  {if  ($1.simb != NULL) $1.simb->inic = $1.simb->ref = TRUE;}
-                    ATRIB  {printf ("= ");}  Expressao  PVIRG
+                    ATRIB  {printf ("= "); indexada = FALSE;}  Expressao  {
+                        if (indexada) {
+                            opndaux = result;
+                            result.tipo = VAROPND;
+                            result.atr.simb = NovaTemp($5.tipo, escopo);
+                            GeraQuadrupla (CONTAPONT, opndaux, opndidle, result);
+                            indexada = FALSE;
+                        }
+                    }
+                    PVIRG
                     {
                         printf (";\n");
                         if ($1.simb != NULL){
@@ -718,7 +753,9 @@ CmdAtrib      	:   Variavel  {if  ($1.simb != NULL) $1.simb->inic = $1.simb->ref
                                 ($1.simb->tvar == FLOAT && $5.tipo == LOGICAL) ||
                                 ($1.simb->tvar == LOGICAL && $5.tipo != LOGICAL))
                                 Incompatibilidade ("Lado direito de comando de atribuicao improprio");
-                                GeraQuadrupla (OPATRIB, $5.opnd, opndidle, $1.opnd);
+                                if ($1.simb->ndims > 0)
+                                    GeraQuadrupla (ATRIBPONT, $5.opnd, opndidle, result);
+                                else GeraQuadrupla (OPATRIB, $5.opnd, opndidle, $1.opnd);
                         }
                     }
                 ;
@@ -941,7 +978,7 @@ Variavel		:   ID  {
                             if ($3 == 0)
                                 $$.opnd.atr.simb = $$.simb;
                         }
-                        if ($3 > 0) {
+                        if ($$.simb->ndims > 0) {
                             $$.opnd.atr.modulo = malloc (sizeof(celmodhead));
                             $$.opnd.atr.modulo->modname = $$.simb;
                             $$.opnd.tipo = INDEXOPND;
@@ -950,6 +987,7 @@ Variavel		:   ID  {
                             result.tipo = VAROPND;
                             result.atr.simb = NovaTemp ($$.simb->tvar, escopo);
                             GeraQuadrupla (INDEX, $$.opnd, opnd2, result);
+                            indexada = TRUE;
                         }
 					}
                 ;

@@ -1,0 +1,5 @@
+To do:
+
+-> inserir CONTAPONT para escrita
+-> ATRIBPONT para mais de uma variável indexada
+-> CONTAPONT para mais de uma vriável indexada

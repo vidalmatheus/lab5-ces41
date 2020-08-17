@@ -10,6 +10,11 @@ programa HelloWorld {{{
    comandos {
           escrever("Hello World!");
           mat[3,4] = 10;
+          ler(mat[3,4]);
+
+          n = mat[2,2];
+          escrever(mat[3,4]);
+
           n = 15;
           ler(c);
           booleana = falso;
