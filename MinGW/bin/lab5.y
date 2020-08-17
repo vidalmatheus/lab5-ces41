@@ -741,7 +741,7 @@ CmdAtrib      	:   Variavel  {if  ($1.simb != NULL) $1.simb->inic = $1.simb->ref
                             result.tipo = VAROPND;
                             result.atr.simb = NovaTemp($5.tipo, escopo);
                             GeraQuadrupla (CONTAPONT, opndaux, opndidle, result);
-                            indexada = FALSE;
+                            GeraQuadrupla (OPATRIB, result, opndidle, $1.opnd);
                         }
                     }
                     PVIRG
@@ -755,9 +755,12 @@ CmdAtrib      	:   Variavel  {if  ($1.simb != NULL) $1.simb->inic = $1.simb->ref
                                 Incompatibilidade ("Lado direito de comando de atribuicao improprio");
                                 if ($1.simb->ndims > 0)
                                     GeraQuadrupla (ATRIBPONT, $5.opnd, opndidle, result);
-                                else GeraQuadrupla (OPATRIB, $5.opnd, opndidle, $1.opnd);
+                                else if (!indexada) 
+                                    GeraQuadrupla (OPATRIB, $5.opnd, opndidle, $1.opnd);
                         }
+                        indexada = FALSE;
                     }
+                    
                 ;
 ListExpr		:  	Expressao {
                         GeraQuadrupla (PARAM, $1.opnd, opndidle, opndidle);
