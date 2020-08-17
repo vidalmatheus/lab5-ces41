@@ -41,6 +41,8 @@ programa HelloWorld {{{
 
           se (mat[3,4] > 10)
                c = 'x';
+          
+          mat[0,10] = 1;
 
    }
 

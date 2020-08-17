@@ -405,13 +405,13 @@ Dims            :
                 ;
 
 ListDim	        : 	CTINT   {printf ("%d ", $1);
-							 if ($1 <= 0) Esperado("Valor inteiro positivo");
+							 if ($1 < 0) Esperado("Valor inteiro nao negativo");
 							 simb->ndims++;
 							 if(simb->ndims > MAXDIMS) Incompatibilidade ("Ultrapassou o maximo de dimensoes");
 							 simb->dims[simb->ndims] = $1;
 							}
                 |   ListDim   VIRG   CTINT   {printf (", %d ", $3);
-											  if($3 <= 0) Esperado("Valor inteiro positivo");
+											  if($3 < 0) Esperado("Valor inteiro nao negativo");
 											  simb->ndims++;
 												if(simb->ndims > MAXDIMS) Incompatibilidade ("Ultrapassou o maximo de dimensoes");
 											  simb->dims[simb->ndims] = $3;
@@ -504,11 +504,11 @@ Comandos       	:   COMANDOS  {printf ("comandos ");}  CmdComp
                 ;
 CmdComp 		:   ABCHAV  {printf ("{\n");}  ListCmd  FCHAV
                     {
-											printf ("}\n");
-											if (quadcorrente->oper != OPRETURN) {
-	    										GeraQuadrupla (OPRETURN, opndidle, opndidle, opndidle);
-											}
-										}
+                        printf ("}\n");
+                        if (quadcorrente->oper != OPRETURN) {
+                            GeraQuadrupla (OPRETURN, opndidle, opndidle, opndidle);
+                        }
+                    }
                 ;
 ListCmd 		:
                 |   ListCmd  Comando
@@ -659,10 +659,10 @@ CmdEscrever   	:	ESCREVER  ABPAR  {printf ("escrever ( ");}  ListEscr {
 ListEscr		:	ElemEscr {
                         $$ = 1;
                         if ($1.opnd.tipo == INDEXOPND){
-                            opndaux = result;
-                            result.tipo = VAROPND;
-                            result.atr.simb = NovaTemp($1.tipo, escopo);
-                            GeraQuadrupla (CONTAPONT, opndaux, opndidle, result);                    
+                            // opndaux = result;
+                            // result.tipo = VAROPND;
+                            // result.atr.simb = NovaTemp($1.tipo, escopo);
+                            // GeraQuadrupla (CONTAPONT, opndaux, opndidle, result);                    
                             GeraQuadrupla (PARAM, result, opndidle, opndidle);
                         }
                         else GeraQuadrupla (PARAM, $1.opnd, opndidle, opndidle);
@@ -670,10 +670,10 @@ ListEscr		:	ElemEscr {
 				|  ListEscr  VIRG  {printf (", ");}  ElemEscr {
                         $$ = $1 + 1;
                         if ($4.opnd.tipo == INDEXOPND){
-                            opndaux = result;
-                            result.tipo = VAROPND;
-                            result.atr.simb = NovaTemp($4.tipo, escopo);
-                            GeraQuadrupla (CONTAPONT, opndaux, opndidle, result);                    
+                            // opndaux = result;
+                            // result.tipo = VAROPND;
+                            // result.atr.simb = NovaTemp($4.tipo, escopo);
+                            // GeraQuadrupla (CONTAPONT, opndaux, opndidle, result);                    
                             GeraQuadrupla (PARAM, result, opndidle, opndidle);
                         }
                         else GeraQuadrupla (PARAM, $4.opnd, opndidle, opndidle);
@@ -735,11 +735,11 @@ CmdRetornar  	:	RETORNAR  PVIRG {
                         printf ("retornar ; ");
                       	GeraQuadrupla (OPRETURN, opndidle, opndidle, opndidle);
                     }
-                {
+                    {
                     if (escopo->tid == IDFUNC)
                         Esperado("Retorno de variavel para funcao");
-                }
-								|   RETORNAR  {printf ("retornar ");}
+                    }
+				|   RETORNAR  {printf ("retornar ");}
                     Expressao
                     {
                         if (escopo->tid == IDPROC)
@@ -753,10 +753,10 @@ CmdRetornar  	:	RETORNAR  PVIRG {
 CmdAtrib      	:   Variavel  {if  ($1.simb != NULL) $1.simb->inic = $1.simb->ref = TRUE;}
                     ATRIB  {printf ("= "); indexada = FALSE;}  Expressao  {
                         if (indexada) {
-                            opndaux = result;
-                            result.tipo = VAROPND;
-                            result.atr.simb = NovaTemp($5.tipo, escopo);
-                            GeraQuadrupla (CONTAPONT, opndaux, opndidle, result);
+                            // opndaux = result;
+                            // result.tipo = VAROPND;
+                            // result.atr.simb = NovaTemp($5.tipo, escopo);
+                            // GeraQuadrupla (CONTAPONT, opndaux, opndidle, result);
                             GeraQuadrupla (OPATRIB, result, opndidle, $1.opnd);
                         }
                     }
@@ -1017,8 +1017,8 @@ Fator		    :   Variavel  {
                 |   CTINT  {printf ("%d ", $1); $$.tipo = INTEGER;
                                 $$.opnd.tipo = INTOPND;
                                 $$.opnd.atr.valint = $1;
- 							    if(indexada == TRUE && $1 <= 0){
-                                    Esperado("Valor inteiro positivo");
+ 							    if(indexada == TRUE && $1 < 0){
+                                    Esperado("Valor inteiro nao negativo");
                                 }
                             }
                 |   CTREAL  {
