@@ -9,7 +9,7 @@ programa CalculaFatorial {{{
     } /* fim do procedimento Hello */
 
 
-    funcao int fatorial (int n)
+    funcao int fatorial (int n, int a, int b)
     var {int (i,prod)}
     comandos {
         prod = 1;
@@ -28,8 +28,8 @@ programa CalculaFatorial {{{
         escrever ("Numero: ");
         ler(n);
         k = 2;
-        n = fatorial(n);
+        n = fatorial(n,n);
         chamar Hello(letra);
-        escrever ("Fatorial de ", n, " ", fatorial(n));
+        escrever ("Fatorial de ", n, " ", fatorial(n,n));
     }
 }}}

@@ -5,16 +5,21 @@ programa HelloWorld {{{
         carac (c, word[10])
         int (i, n, mat[5,5], prod)
         real (numero)
-        logic (booleana)
+        logic (booleana, v[4,4])
    }
    comandos {
           escrever("Hello World!");
           mat[3,4] = 10;
-          ler(mat[3,4]);
+          ler(mat[3,4], mat[4,5]);
 
           n = mat[2,2];
-          escrever(mat[3,4]);
+          escrever(mat[3,4], mat[2,1]);
 
+          v[1,2] = falso;
+          v[1,1] = verdade;
+          se (v[1,2] != verdade)
+               c = 'b';
+          
           n = 15;
           ler(c);
           booleana = falso;
@@ -24,7 +29,7 @@ programa HelloWorld {{{
 
           repetir 
                numero = numero+1;
-          enquanto (!booleana);
+          enquanto (!v[1,1]);
 
           prod = 1;
           para i (1;i<=n;i+1) {
@@ -33,6 +38,10 @@ programa HelloWorld {{{
 
           i = 5;
           escrever("Hello World!");
+
+          se (mat[3,4] > 10)
+               c = 'x';
+
    }
 
 }}} /* Fim do programa HelloWorld */

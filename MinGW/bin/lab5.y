@@ -247,9 +247,17 @@ struct infovariavel {
 };
 
 
-/* Variaveis globais para a última váriável indexada */
+/* Variaveis e protótipos globais para variáveis indexadas */
 
-infovariavel lastvarindex;
+struct nodeIndex {
+    operando opnd1, result;
+    struct nodeIndex* prox;
+};
+
+struct nodeIndex* listvarindex;
+
+void addToListIndex(operando, operando);
+void GeraQuadruplaIndex(void);
 
 %}
 
@@ -609,14 +617,12 @@ CmdPara	    	:   PARA  {printf ("para ");}  Variavel
                             RenumQuadruplas ($<quad>12, quadcorrente);
                         }
                 ;
-CmdLer   	    :   LER  ABPAR  {printf ("ler ( ");}  ListLeit  {
+CmdLer   	    :   LER  ABPAR  {printf ("ler ( ");}  {listvarindex = NULL;} ListLeit  {
                         opnd1.tipo = INTOPND;
-                        opnd1.atr.valint = $4;
+                        opnd1.atr.valint = $5;
                         GeraQuadrupla (OPREAD, opnd1, opndidle, opndidle);
-                        if (lastvarindex.simb != NULL){
-                            GeraQuadrupla (ATRIBPONT, lastvarindex.opnd, opndidle, result);
-                        }
-                        lastvarindex.simb = NULL;
+                        GeraQuadruplaIndex();
+                        listvarindex = NULL;
                     } FPAR  PVIRG
                     {printf (") ;\n");}
                 ;
@@ -627,7 +633,7 @@ ListLeit		:   Variavel {
                         if ($1.simb->ndims > 0){
                             $1.opnd.tipo = VAROPND;
                             $1.opnd.atr.simb = NovaTemp ($1.simb->tvar, escopo);
-                            lastvarindex = $1;
+                            addToListIndex($1.opnd, result);
                         }
                         GeraQuadrupla (PARAM, $1.opnd, opndidle, opndidle);
                     }
@@ -638,6 +644,7 @@ ListLeit		:   Variavel {
                         if ($4.simb->ndims > 0){
                             $4.opnd.tipo = VAROPND;
                             $4.opnd.atr.simb = NovaTemp ($4.simb->tvar, escopo);
+                            addToListIndex($4.opnd, result);
                         }
                         GeraQuadrupla (PARAM, $4.opnd, opndidle, opndidle);
                     }
@@ -652,15 +659,24 @@ CmdEscrever   	:	ESCREVER  ABPAR  {printf ("escrever ( ");}  ListEscr {
 ListEscr		:	ElemEscr {
                         $$ = 1;
                         if ($1.opnd.tipo == INDEXOPND){
-                            $1.opnd = result;
+                            opndaux = result;
+                            result.tipo = VAROPND;
+                            result.atr.simb = NovaTemp($1.tipo, escopo);
+                            GeraQuadrupla (CONTAPONT, opndaux, opndidle, result);                    
+                            GeraQuadrupla (PARAM, result, opndidle, opndidle);
                         }
-                        GeraQuadrupla (PARAM, $1.opnd, opndidle, opndidle);
+                        else GeraQuadrupla (PARAM, $1.opnd, opndidle, opndidle);
                     }
 				|  ListEscr  VIRG  {printf (", ");}  ElemEscr {
                         $$ = $1 + 1;
-                        if ($4.opnd.tipo == INDEXOPND)
-                            $4.opnd = result;
-                        GeraQuadrupla (PARAM, $4.opnd, opndidle, opndidle);
+                        if ($4.opnd.tipo == INDEXOPND){
+                            opndaux = result;
+                            result.tipo = VAROPND;
+                            result.atr.simb = NovaTemp($4.tipo, escopo);
+                            GeraQuadrupla (CONTAPONT, opndaux, opndidle, result);                    
+                            GeraQuadrupla (PARAM, result, opndidle, opndidle);
+                        }
+                        else GeraQuadrupla (PARAM, $4.opnd, opndidle, opndidle);
                     }
                 ;
 ElemEscr		:   CADEIA  {
@@ -796,11 +812,29 @@ ExprAux2    	:   ExprAux3
                         $$.tipo = LOGICAL;
                         $$.opnd.tipo = VAROPND;
                         $$.opnd.atr.simb = NovaTemp ($3.tipo, escopo);
+                        if ($3.opnd.tipo == INDEXOPND){
+                            $3.opnd = result;
+                        }
                         GeraQuadrupla (OPNOT, $3.opnd, opndidle, $$.opnd);
                     }
                 ;
-ExprAux3    	:   ExprAux4
+ExprAux3    	:   ExprAux4 {
+                        if ($1.opnd.tipo == INDEXOPND){
+                            opndaux = result;
+                            result.tipo = VAROPND;
+                            result.atr.simb = NovaTemp($1.tipo, escopo);
+                            GeraQuadrupla (CONTAPONT, opndaux, opndidle, result);    
+                        }
+                    }
                 |   ExprAux4  OPREL  {
+                        if ($1.opnd.tipo == INDEXOPND){
+                            opndaux = result;
+                            result.tipo = VAROPND;
+                            result.atr.simb = NovaTemp($1.tipo, escopo);
+                            opndaux2 = result;
+                            GeraQuadrupla (CONTAPONT, opndaux, opndidle, result);    
+                        }
+
                         switch ($2) {
                             case LT: printf ("< "); break;
                             case LE: printf ("<= "); break;
@@ -820,28 +854,105 @@ ExprAux3    	:   ExprAux4
                                     Incompatibilidade ("Operando improprio para operador relacional");
                                 break;
                         }
+
+                        if ($4.opnd.tipo == INDEXOPND){
+                            opndaux = result;
+                            result.tipo = VAROPND;
+                            result.atr.simb = NovaTemp($4.tipo, escopo);
+                            GeraQuadrupla (CONTAPONT, opndaux, opndidle, result);    
+                        }
+
                         $$.tipo = LOGICAL;
                         $$.opnd.tipo = VAROPND;
                         $$.opnd.atr.simb = NovaTemp ($$.tipo, escopo);
-                        switch ($2) {
-                            case LT:
-                                GeraQuadrupla (OPLT, $1.opnd, $4.opnd, $$.opnd);
-                                break;
-                            case LE:
-                                GeraQuadrupla (OPLE, $1.opnd, $4.opnd, $$.opnd);
-                                break;
-                            case GT:
-                                GeraQuadrupla (OPGT, $1.opnd, $4.opnd, $$.opnd);
-                                break;
-                            case GE:
-                                GeraQuadrupla (OPGE, $1.opnd, $4.opnd, $$.opnd);
-                                break;
-                            case EQ:
-                                GeraQuadrupla (OPEQ, $1.opnd, $4.opnd, $$.opnd);
-                                break;
-                            case NE:
-                                GeraQuadrupla (OPNE, $1.opnd, $4.opnd, $$.opnd);
-                                break;
+
+                        if ($1.opnd.tipo == INDEXOPND && $4.opnd.tipo == INDEXOPND){
+                            switch ($2) {
+                                case LT:
+                                    GeraQuadrupla (OPLT, opndaux2, result, $$.opnd);
+                                    break;
+                                case LE:
+                                    GeraQuadrupla (OPLE, opndaux2, result, $$.opnd);
+                                    break;
+                                case GT:
+                                    GeraQuadrupla (OPGT, opndaux2, result, $$.opnd);
+                                    break;
+                                case GE:
+                                    GeraQuadrupla (OPGE, opndaux2, result, $$.opnd);
+                                    break;
+                                case EQ:
+                                    GeraQuadrupla (OPEQ, opndaux2, result, $$.opnd);
+                                    break;
+                                case NE:
+                                    GeraQuadrupla (OPNE, opndaux2, result, $$.opnd);
+                                    break;
+                            }
+                        }
+                        else if ($1.opnd.tipo != INDEXOPND && $4.opnd.tipo == INDEXOPND){
+                            switch ($2) {
+                                case LT:
+                                    GeraQuadrupla (OPLT, $1.opnd, result, $$.opnd);
+                                    break;
+                                case LE:
+                                    GeraQuadrupla (OPLE, $1.opnd, result, $$.opnd);
+                                    break;
+                                case GT:
+                                    GeraQuadrupla (OPGT, $1.opnd, result, $$.opnd);
+                                    break;
+                                case GE:
+                                    GeraQuadrupla (OPGE, $1.opnd, result, $$.opnd);
+                                    break;
+                                case EQ:
+                                    GeraQuadrupla (OPEQ, $1.opnd, result, $$.opnd);
+                                    break;
+                                case NE:
+                                    GeraQuadrupla (OPNE, $1.opnd, result, $$.opnd);
+                                    break;
+                            }
+                        }
+                        else if ($1.opnd.tipo == INDEXOPND && $4.opnd.tipo != INDEXOPND){
+                            switch ($2) {
+                                case LT:
+                                    GeraQuadrupla (OPLT, opndaux2, $4.opnd, $$.opnd);
+                                    break;
+                                case LE:
+                                    GeraQuadrupla (OPLE, opndaux2, $4.opnd, $$.opnd);
+                                    break;
+                                case GT:
+                                    GeraQuadrupla (OPGT, opndaux2, $4.opnd, $$.opnd);
+                                    break;
+                                case GE:
+                                    GeraQuadrupla (OPGE, opndaux2, $4.opnd, $$.opnd);
+                                    break;
+                                case EQ:
+                                    GeraQuadrupla (OPEQ, opndaux2, $4.opnd, $$.opnd);
+                                    break;
+                                case NE:
+                                    GeraQuadrupla (OPNE, opndaux2, $4.opnd, $$.opnd);
+                                    break;
+                            }
+                        }
+                        else {
+                            switch ($2) {
+                                case LT:
+                                    GeraQuadrupla (OPLT, $1.opnd, $4.opnd, $$.opnd);
+                                    break;
+                                case LE:
+                                    GeraQuadrupla (OPLE, $1.opnd, $4.opnd, $$.opnd);
+                                    break;
+                                case GT:
+                                    GeraQuadrupla (OPGT, $1.opnd, $4.opnd, $$.opnd);
+                                    break;
+                                case GE:
+                                    GeraQuadrupla (OPGE, $1.opnd, $4.opnd, $$.opnd);
+                                    break;
+                                case EQ:
+                                    GeraQuadrupla (OPEQ, $1.opnd, $4.opnd, $$.opnd);
+                                    break;
+                                case NE:
+                                    GeraQuadrupla (OPNE, $1.opnd, $4.opnd, $$.opnd);
+                                    break;
+                            }
                         }
                     }
                 ;
@@ -1041,7 +1152,6 @@ ChamadaFunc   :   ID  {
                         $$.simb = $<simb>2;
 
                         pointsToMod($<simb>2);
-                        printf("simb->cadeia -> %s", $<simb>2->cadeia);
 
                         opnd1.tipo = FUNCOPND;
                         opnd1.atr.modulo = modcorrente;
@@ -1171,6 +1281,7 @@ void VerificaInicRef () {
 }
 
 void addToList(listsimb* lista, int tvar, int tid){
+    listsimb aux;
     if (*lista == NULL){
         *lista = (listsimb) malloc (sizeof (elemlistsimb));
         (*lista)->simb = (simbolo) NULL;
@@ -1180,11 +1291,12 @@ void addToList(listsimb* lista, int tvar, int tid){
         (*lista)->prox = NULL;
     }
     else {
-        (*lista)->prox = (listsimb) malloc (sizeof (elemlistsimb));
-        (*lista)->prox->simb = (simbolo) malloc (sizeof (celsimb));
-        (*lista)->prox->simb->tvar = tvar;
-        (*lista)->prox->simb->tid = tid;
-        (*lista)->prox->prox = NULL;
+        for (aux = *lista; aux->prox!=NULL; aux = aux->prox);
+        aux->prox = (listsimb) malloc (sizeof (elemlistsimb));
+        aux->prox->simb = (simbolo) malloc (sizeof (celsimb));
+        aux->prox->simb->tvar = tvar;
+        aux->prox->simb->tid = tid;
+        aux->prox->prox = NULL;
     }
 }
 
@@ -1349,4 +1461,30 @@ void pointsToMod(simbolo simb){
     for (p = modglobal; p!=NULL; p = p->prox)
         if (strcmp(p->modname->cadeia, simb->cadeia) == 0)
             modcorrente = p;
+}
+
+void addToListIndex(operando opnd1, operando result){
+    struct nodeIndex* lista = listvarindex;
+    if (lista == NULL){
+        lista = (struct nodeIndex*) malloc (sizeof (struct nodeIndex));
+        lista->opnd1 = opnd1;
+        lista->result = result;        
+        lista->prox = NULL;
+        listvarindex = lista;
+    }
+    else {
+        for (lista = listvarindex; lista->prox!=NULL; lista = lista->prox);
+        lista->prox = (struct nodeIndex*) malloc (sizeof (struct nodeIndex));
+        lista = lista->prox;
+        lista->opnd1 = opnd1;
+        lista->result = result;        
+        lista->prox = NULL;
+    }
+}
+
+void GeraQuadruplaIndex(void){
+    struct nodeIndex* lista;
+    for (lista = listvarindex; lista!=NULL; lista = lista->prox){
+        GeraQuadrupla(ATRIBPONT, lista->opnd1, opndidle, lista->result);
+    }
 }
