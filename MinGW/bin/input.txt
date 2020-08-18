@@ -26,6 +26,18 @@ programa HelloWorld {{{
           se (v[1,1])
                c = 'z';
           
+          enquanto(v[1,1]){
+               escrever("Hi");
+          }
+          
+          repetir{
+               escrever("Aloha");
+          }enquanto(v[1,2] < v[1,1]);
+
+          repetir{
+               escrever("Brasil");
+          }enquanto(v[1,2]);
+
           n = 15;
           ler(c);
           booleana = falso;
@@ -41,7 +53,7 @@ programa HelloWorld {{{
           }enquanto (!v[1,1]);
 
           prod = 1;
-          para i (1;i<=n;i+1) {
+          para i (1;v[1,1] && v[3,4] == 10;i+1) {
                prod = prod*i;
           }
 

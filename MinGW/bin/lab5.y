@@ -508,9 +508,6 @@ Comandos       	:   COMANDOS  {printf ("comandos ");}  CmdComp
 CmdComp 		:   ABCHAV  {printf ("{\n");}  ListCmd  FCHAV
                     {
                         printf ("}\n");
-                        // if (quadcorrente->oper != OPRETURN) {
-                        //     GeraQuadrupla (OPRETURN, opndidle, opndidle, opndidle);
-                        // }
                     }
                 ;
 ListCmd 		:
@@ -525,7 +522,9 @@ CmdSe		    :   SE    ABPAR  {printf ("se ( ");}  Expressao  {
                         if ($4.tipo != LOGICAL)
                             Incompatibilidade ("Expressao nao logica em comando se");
                         opndaux.tipo = ROTOPND;
-                        $<quad>$ = GeraQuadrupla (OPJF, $4.opnd, opndidle, opndaux);
+                        if ($4.opnd.tipo == INDEXOPND)
+                            $<quad>$ = GeraQuadrupla (OPJF, result, opndidle, opndaux);
+                        else $<quad>$ = GeraQuadrupla (OPJF, $4.opnd, opndidle, opndaux);
                     }  FPAR  {printf (")\n");}  Comando  {
                         $<quad>$ = quadcorrente;
                         $<quad>5->result.atr.rotulo = GeraQuadrupla (NOP, opndidle, opndidle, opndidle);
@@ -555,7 +554,11 @@ CmdEnquanto   	:	ENQUANTO  ABPAR  {
                         if ($4.tipo != LOGICAL)
                             Incompatibilidade ("Expressao nao logica em comando enquanto");
                         opndaux.tipo = ROTOPND;
-                        $<quad>$ = GeraQuadrupla (OPJF, $4.opnd, opndidle, opndaux);
+                        printf("        $4.opnd.tipo\n", $4.opnd.tipo);
+                        if ($4.opnd.tipo == INDEXOPND){
+                            $<quad>$ = GeraQuadrupla (OPJF, result, opndidle, opndaux);
+                        }
+                        else $<quad>$ = GeraQuadrupla (OPJF, $4.opnd, opndidle, opndaux);
                     }  FPAR  {printf (")\n");}  Comando {
                         opndaux.tipo = ROTOPND;
                         opndaux.atr.rotulo = $<quad>3;
@@ -572,7 +575,9 @@ CmdRepetir  	:   REPETIR {
                             Incompatibilidade ("Expressao nao logica em comando enquanto");
                         opndaux.tipo = ROTOPND;
                         opndaux.atr.rotulo = $<quad>2;
-                        GeraQuadrupla (OPJF, $7.opnd, opndidle, opndaux);
+                        if ($7.opnd.tipo == INDEXOPND)
+                            GeraQuadrupla (OPJF, result, opndidle, opndaux);
+                        else GeraQuadrupla (OPJF, $7.opnd, opndidle, opndaux);
                     }
 				    FPAR  PVIRG {printf (") ;\n");}
                 ;
@@ -598,7 +603,9 @@ CmdPara	    	:   PARA  {printf ("para ");}  Variavel
                         if ($11.tipo != LOGICAL)
                             Incompatibilidade ("Expressao do tipo nao logica em comando para");
                     	opndaux.tipo = ROTOPND;
-            	        $<quad>$ = GeraQuadrupla (OPJF, $11.opnd, opndidle, opndaux);
+                        if ($11.opnd.tipo == INDEXOPND)
+                            $<quad>$ = GeraQuadrupla (OPJF, result, opndidle, opndaux);
+            	        else $<quad>$ = GeraQuadrupla (OPJF, $11.opnd, opndidle, opndaux);
                     }  PVIRG {
                         printf ("; ");
                         $<quad>$ = GeraQuadrupla (NOP, opndidle, opndidle, opndidle);

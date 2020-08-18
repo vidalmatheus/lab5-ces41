@@ -1,5 +1,10 @@
 To do:
 
--> inserir CONTAPONT para escrita
--> ATRIBPONT para mais de uma variável indexada
--> CONTAPONT para mais de uma vriável indexada
+-> inserir CONTAPONT para escrita ok
+-> ATRIBPONT para mais de uma variável indexada ok
+-> CONTAPONT para mais de uma vriável indexada ok
+
+-> consertar ATRIB ok
+-> lógica para indexada AND OR ok
+-> OPAD, OPMENOS, OPMULT, OPDIV para variavel indexada
+-> se/para/repetir/enquanto item v[1,2] sozinho ok
