@@ -5,17 +5,17 @@ programa CalculaFatorial {{{
     procedimento Hello (carac nome)
     comandos {
             escrever ("Hello, ", nome);
-            
+
     } /* fim do procedimento Hello */
 
 
-    funcao int fatorial (int n, int a, int b)
+    funcao int fatorial (int n)
     var {int (i,prod)}
     comandos {
         prod = 1;
-        para i (1;i<=n;i+1) {
+        para i (1;i<=n;i+1)
             prod = prod*i;
-        }
+
         retornar prod;
     }
 
@@ -28,8 +28,9 @@ programa CalculaFatorial {{{
         escrever ("Numero: ");
         ler(n);
         k = 2;
-        n = fatorial(n,n);
+        n = fatorial(n);
+        ler(letra);
         chamar Hello(letra);
-        escrever ("Fatorial de ", n, " ", fatorial(n,n));
+        escrever ("Fatorial de ", n, " ", fatorial(n));
     }
 }}}

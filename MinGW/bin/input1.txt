@@ -1,0 +1,46 @@
+programa HelloWorld {{{
+
+    procedimento Hello (carac nome)
+    comandos {
+            escrever ("Hello, ", nome);
+    } /* fim do procedimento Hello */
+
+    funcao carac Hello2 (carac nome, carac x)
+    comandos {
+            escrever ("Hello, ", nome);
+            retornar x;
+    } /* fim do procedimento Hello */
+
+    principal
+    var {
+        carac (a,b)
+        int (i, j, v[10], mat[5,5])
+        real (x)
+    }
+    comandos {
+        x = 1.2 + 2.3*4;
+        b = 'b';
+        para i (1; i<10; i+1)
+            v[i] = i;
+
+        i = v[5] + 3;
+
+        para i (0; i <= 4; i+1)
+		      para j (0; j <= 4; j+1)
+            ler (mat[i,j]);
+
+
+        i = mat[2,3]*2;
+        mat[1,1] = v[3] + 2;
+
+        ler(mat[2,2], mat[3,1], v[2]);
+        escrever ("Novos valores: ", mat[2,2], mat[1,1]);
+
+        chamar Hello(b);
+
+        a = Hello2(b,a);
+        ler(v[5]);
+        escrever("Entrada: ", v[5]);
+
+    }
+}}}
