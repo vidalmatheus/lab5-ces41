@@ -1,0 +1,57 @@
+programa OpRelacionais {{{
+    principal
+    var {
+      int (mat[5,5], prod, i)
+      real (numero)
+      carac (c)
+      logic (v[6,6], booleana)
+    }
+    comandos {
+
+          ler(mat[3,4], mat[2,1]);
+          escrever(mat[3,4], mat[2,1]);
+
+          v[1,2] = falso;
+          v[1,1] = verdade;
+          se (v[1,2] && v[1,1])
+               c = 'b';
+
+          se (v[1,2] || v[1,1])
+               c = 'y';
+
+          se (v[1,1])
+               c = 'z';
+          
+          se (mat[3,4] > 10)
+               c = 'x';
+
+          enquanto(v[1,1]){
+               escrever("Hi");
+          }
+          
+          repetir{
+               escrever("Aloha");
+          }enquanto(v[1,2] < v[1,1]);
+
+          repetir{
+               escrever("Brasil");
+          }enquanto(v[1,2]);
+
+          booleana = falso;
+
+          se (booleana){ 
+               se(booleana)
+               {c = 'a'; }
+          }
+          senao { numero = 2.5; } 
+
+          repetir {
+               numero = numero+1;
+          }enquanto (!v[1,1]);
+
+          prod = 1;
+          para i (1;v[1,1] && v[3,4] == 10;i+1) {
+               prod = prod*i;
+          }
+    }
+}}}
