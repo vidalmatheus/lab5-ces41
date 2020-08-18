@@ -424,11 +424,14 @@ ListMod 	    :
 
 Modulo        	:	Cabecalho  Corpo {
                         escopo = escopo->escopo;
+                        if (inside)
+                            GeraQuadrupla (OPRETURN, opndidle, opndidle, opndidle);
+                        inside = FALSE;
                         }
                 ;
 
 Cabecalho     	:   CabFunc
-                |   CabProc
+                |   {inside = TRUE;} CabProc
                 ;
 
 CabFunc	    	:   FUNCAO {printf ("funcao ");} Tipo
@@ -498,16 +501,16 @@ ModPrincipal  	:   PRINCIPAL {
                         opnd1.atr.modulo = modcorrente;
                         GeraQuadrupla(OPENMOD, opnd1, opndidle, opndidle);
                         }
-                        {printf ("principal\n");}  Corpo
+                        {printf ("principal\n");}  Corpo {GeraQuadrupla (OPRETURN, opndidle, opndidle, opndidle);}
                 ;
 Comandos       	:   COMANDOS  {printf ("comandos ");}  CmdComp
                 ;
 CmdComp 		:   ABCHAV  {printf ("{\n");}  ListCmd  FCHAV
                     {
                         printf ("}\n");
-                        if (quadcorrente->oper != OPRETURN) {
-                            GeraQuadrupla (OPRETURN, opndidle, opndidle, opndidle);
-                        }
+                        // if (quadcorrente->oper != OPRETURN) {
+                        //     GeraQuadrupla (OPRETURN, opndidle, opndidle, opndidle);
+                        // }
                     }
                 ;
 ListCmd 		:

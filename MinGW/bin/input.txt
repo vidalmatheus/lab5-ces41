@@ -24,12 +24,15 @@ programa HelloWorld {{{
           ler(c);
           booleana = falso;
 
-          se (booleana) c = 'a';
-          senao numero = 2.5;
+          se (booleana){ 
+               se(booleana)
+               {c = 'a'; }
+          }
+          senao { numero = 2.5; } 
 
-          repetir 
+          repetir {
                numero = numero+1;
-          enquanto (!v[1,1]);
+          }enquanto (!v[1,1]);
 
           prod = 1;
           para i (1;i<=n;i+1) {
