@@ -18,7 +18,7 @@ programa HelloWorld {{{
         real (x)
     }
     comandos {
-        x = 1.2;
+        x = 1.2 + 2.3*4;
         b = 'b';
         para i (1; i<10; i+1)
             v[i] = i;
@@ -32,6 +32,9 @@ programa HelloWorld {{{
 
         i = mat[2,3]*2;
         mat[1,1] = v[3] + 2;
+
+        ler(mat[2,2], mat[3,1], v[2]);
+        escrever ("Novos valores: ", mat[2,2], mat[1,1]);
 
         chamar Hello(b);
 
