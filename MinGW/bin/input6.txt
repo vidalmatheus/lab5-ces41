@@ -1,4 +1,4 @@
-programa OpRelacionais {{{
+programa VariavelIndexada {{{
     principal
     var {
       int (mat[5,5], prod, i)
