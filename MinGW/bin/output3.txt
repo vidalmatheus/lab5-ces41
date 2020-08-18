@@ -1,0 +1,150 @@
+programa CalculaRaizQuadrada {{{
+funcao int raizQuadradaAprox ( int x )
+var {
+int ( left , right , mid )
+}
+comandos {
+se ( x == 0 )
+retornar 0 ;
+left = 1 ;
+right = x - 1 ;
+enquanto ( left < right )
+{
+mid = left + ( right - left ) / 2 ;
+se ( mid < x / mid )
+left = mid + 1 ;
+senao
+se ( mid > x / mid )
+right = mid - 1 ;
+senao
+retornar mid ;
+}
+se ( left >= x / left + 1 )
+retornar left - 1 ;
+senao
+retornar left ;
+}
+principal
+var {
+int ( x )
+}
+comandos {
+escrever ( "Numero: " ) ;
+ler ( x ) ;
+escrever ( "Raiz Quadrada de " , x , " " , raizQuadradaAprox (x ) ) ;
+}
+}}}
+
+
+
+   TABELA  DE  SIMBOLOS:
+
+Classe 4:
+  (##1, IDVAR, LOGICAL, 1, 1, raizQuadradaAprox)
+Classe 5:
+  (x, IDVAR, INTEGER, 1, 1, ##principal)
+  (##2, IDVAR, INTEGER, 1, 1, raizQuadradaAprox)
+  (x, IDVAR, INTEGER, 1, 1, raizQuadradaAprox)
+  (##global, IDGLOB)
+Classe 6:
+  (##10, IDVAR, INTEGER, 1, 1, raizQuadradaAprox)
+  (##3, IDVAR, LOGICAL, 1, 1, raizQuadradaAprox)
+Classe 7:
+  (##11, IDVAR, LOGICAL, 1, 1, raizQuadradaAprox)
+  (##4, IDVAR, INTEGER, 1, 1, raizQuadradaAprox)
+Classe 8:
+  (##12, IDVAR, INTEGER, 1, 1, raizQuadradaAprox)
+  (##5, IDVAR, INTEGER, 1, 1, raizQuadradaAprox)
+Classe 9:
+  (##13, IDVAR, INTEGER, 1, 1, raizQuadradaAprox)
+  (##6, IDVAR, INTEGER, 1, 1, raizQuadradaAprox)
+Classe 10:
+  (##14, IDVAR, INTEGER, 1, 1, raizQuadradaAprox)
+  (##7, IDVAR, INTEGER, 1, 1, raizQuadradaAprox)
+Classe 11:
+  (##15, IDVAR, LOGICAL, 1, 1, raizQuadradaAprox)
+  (##8, IDVAR, LOGICAL, 1, 1, raizQuadradaAprox)
+Classe 12:
+  (##16, IDVAR, INTEGER, 1, 1, raizQuadradaAprox)
+  (##9, IDVAR, INTEGER, 1, 1, raizQuadradaAprox)
+Classe 13:
+  (##17, IDVAR, INTEGER, 1, 1, ##principal)
+  (right, IDVAR, INTEGER, 1, 1, raizQuadradaAprox)
+  (left, IDVAR, INTEGER, 1, 1, raizQuadradaAprox)
+Classe 15:
+  (mid, IDVAR, INTEGER, 1, 1, raizQuadradaAprox)
+  (raizQuadradaAprox, IDFUNC, INTEGER, ##global)
+Classe 16:
+  (CalculaRaizQuadrada, IDPROG, ##global)
+Classe 20:
+  (##principal, IDPRINCIPAL, ##global)
+
+
+Quadruplas do modulo CalculaRaizQuadrada:
+
+	   1) OPENMOD, (MODULO, CalculaRaizQuadrada), (IDLE), (IDLE)
+	   2) OPCALL, (FUNCAO, ##principal), (IDLE), (IDLE)
+	   3) EXIT, (IDLE), (IDLE), (IDLE)
+
+Quadruplas do modulo raizQuadradaAprox:
+
+	   1) OPENMOD, (FUNCAO, raizQuadradaAprox), (IDLE), (IDLE)
+	   2) EQ, (VAR, x), (INT, 0), (VAR, ##1)
+	   3) JF, (VAR, ##1), (IDLE), (ROTULO, 5)
+	   4) OPRETURN, (INT, 0), (IDLE), (IDLE)
+	   5) NOP, (IDLE), (IDLE), (IDLE)
+	   6) ATRIB, (INT, 1), (IDLE), (VAR, left)
+	   7) MENOS, (VAR, x), (INT, 1), (VAR, ##2)
+	   8) ATRIB, (VAR, ##2), (IDLE), (VAR, right)
+	   9) NOP, (IDLE), (IDLE), (IDLE)
+	  10) LT, (VAR, left), (VAR, right), (VAR, ##3)
+	  11) JF, (VAR, ##3), (IDLE), (ROTULO, 34)
+	  12) MENOS, (VAR, right), (VAR, left), (VAR, ##4)
+	  13) DIV, (VAR, ##4), (INT, 2), (VAR, ##5)
+	  14) MAIS, (VAR, left), (VAR, ##5), (VAR, ##6)
+	  15) ATRIB, (VAR, ##6), (IDLE), (VAR, mid)
+	  16) DIV, (VAR, x), (VAR, mid), (VAR, ##7)
+	  17) LT, (VAR, mid), (VAR, ##7), (VAR, ##8)
+	  18) JF, (VAR, ##8), (IDLE), (ROTULO, 22)
+	  19) MAIS, (VAR, mid), (INT, 1), (VAR, ##9)
+	  20) ATRIB, (VAR, ##9), (IDLE), (VAR, left)
+	  21) JUMP, (IDLE), (IDLE), (ROTULO, 32)
+	  22) NOP, (IDLE), (IDLE), (IDLE)
+	  23) DIV, (VAR, x), (VAR, mid), (VAR, ##10)
+	  24) GT, (VAR, mid), (VAR, ##10), (VAR, ##11)
+	  25) JF, (VAR, ##11), (IDLE), (ROTULO, 29)
+	  26) MENOS, (VAR, mid), (INT, 1), (VAR, ##12)
+	  27) ATRIB, (VAR, ##12), (IDLE), (VAR, right)
+	  28) JUMP, (IDLE), (IDLE), (ROTULO, 31)
+	  29) NOP, (IDLE), (IDLE), (IDLE)
+	  30) OPRETURN, (VAR, mid), (IDLE), (IDLE)
+	  31) NOP, (IDLE), (IDLE), (IDLE)
+	  32) NOP, (IDLE), (IDLE), (IDLE)
+	  33) JUMP, (IDLE), (IDLE), (ROTULO, 9)
+	  34) NOP, (IDLE), (IDLE), (IDLE)
+	  35) DIV, (VAR, x), (VAR, left), (VAR, ##13)
+	  36) MAIS, (VAR, ##13), (INT, 1), (VAR, ##14)
+	  37) GE, (VAR, left), (VAR, ##14), (VAR, ##15)
+	  38) JF, (VAR, ##15), (IDLE), (ROTULO, 42)
+	  39) MENOS, (VAR, left), (INT, 1), (VAR, ##16)
+	  40) OPRETURN, (VAR, ##16), (IDLE), (IDLE)
+	  41) JUMP, (IDLE), (IDLE), (ROTULO, 44)
+	  42) NOP, (IDLE), (IDLE), (IDLE)
+	  43) OPRETURN, (VAR, left), (IDLE), (IDLE)
+	  44) NOP, (IDLE), (IDLE), (IDLE)
+
+Quadruplas do modulo ##principal:
+
+	   1) OPENMOD, (FUNCAO, ##principal), (IDLE), (IDLE)
+	   2) PARAM, (CADEIA, Numero: ), (IDLE), (IDLE)
+	   3) WRITE, (INT, 1), (IDLE), (IDLE)
+	   4) PARAM, (VAR, x), (IDLE), (IDLE)
+	   5) READ, (INT, 1), (IDLE), (IDLE)
+	   6) PARAM, (CADEIA, Raiz Quadrada de ), (IDLE), (IDLE)
+	   7) PARAM, (VAR, x), (IDLE), (IDLE)
+	   8) PARAM, (CADEIA,  ), (IDLE), (IDLE)
+	   9) PARAM, (VAR, x), (IDLE), (IDLE)
+	  10) OPCALL, (FUNCAO, raizQuadradaAprox), (INT, 1), (VAR, ##17)
+	  11) PARAM, (VAR, ##17), (IDLE), (IDLE)
+	  12) WRITE, (INT, 4), (IDLE), (IDLE)
+	  13) OPRETURN, (IDLE), (IDLE), (IDLE)

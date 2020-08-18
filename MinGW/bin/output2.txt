@@ -1,0 +1,126 @@
+programa CalculaFatorial {{{
+var {
+int ( k )
+}
+procedimento Hello ( carac nome )
+comandos {
+escrever ( "Hello, " , nome ) ;
+}
+funcao int fatorial ( int n )
+var {
+int ( i , prod )
+}
+comandos {
+prod = 1 ;
+para i ( 1 ; i <= n ; i + 1 ) 
+prod = prod * i ;
+retornar prod ;
+}
+principal
+var {
+int ( n )
+carac ( letra )
+}
+comandos {
+escrever ( "Numero: " ) ;
+ler ( n ) ;
+k = 2 ;
+n = fatorial (n ) ;
+ler ( letra ) ;
+chamar Hello (letra ) ;
+escrever ( "Fatorial de " , n , " " , fatorial (n ) ) ;
+}
+}}}
+
+
+
+   TABELA  DE  SIMBOLOS:
+
+Classe 0:
+  (prod, IDVAR, INTEGER, 1, 1, fatorial)
+Classe 4:
+  (##1, IDVAR, LOGICAL, 1, 1, fatorial)
+Classe 5:
+  (##2, IDVAR, INTEGER, 1, 1, fatorial)
+  (##global, IDGLOB)
+Classe 6:
+  (##3, IDVAR, INTEGER, 1, 1, fatorial)
+Classe 7:
+  (##4, IDVAR, INTEGER, 1, 1, ##principal)
+  (letra, IDVAR, CHAR, 1, 1, ##principal)
+Classe 8:
+  (##5, IDVAR, INTEGER, 1, 1, ##principal)
+Classe 9:
+  (##6, IDVAR, INTEGER, 1, 1, ##principal)
+Classe 13:
+  (i, IDVAR, INTEGER, 1, 1, fatorial)
+Classe 15:
+  (k, IDVAR, INTEGER, 1, 1, ##global)
+Classe 16:
+  (CalculaFatorial, IDPROG, ##global)
+Classe 17:
+  (nome, IDVAR, CHAR, 1, 1, Hello)
+  (Hello, IDPROC, ##global)
+Classe 18:
+  (n, IDVAR, INTEGER, 1, 1, ##principal)
+  (n, IDVAR, INTEGER, 1, 1, fatorial)
+Classe 20:
+  (##principal, IDPRINCIPAL, ##global)
+Classe 22:
+  (fatorial, IDFUNC, INTEGER, ##global)
+
+
+Quadruplas do modulo CalculaFatorial:
+
+	   1) OPENMOD, (MODULO, CalculaFatorial), (IDLE), (IDLE)
+	   2) OPCALL, (FUNCAO, ##principal), (IDLE), (IDLE)
+	   3) EXIT, (IDLE), (IDLE), (IDLE)
+
+Quadruplas do modulo Hello:
+
+	   1) OPENMOD, (PROCEDIMENTO, Hello), (IDLE), (IDLE)
+	   2) PARAM, (CADEIA, Hello, ), (IDLE), (IDLE)
+	   3) PARAM, (VAR, nome), (IDLE), (IDLE)
+	   4) WRITE, (INT, 2), (IDLE), (IDLE)
+	   5) OPRETURN, (IDLE), (IDLE), (IDLE)
+
+Quadruplas do modulo fatorial:
+
+	   1) OPENMOD, (FUNCAO, fatorial), (IDLE), (IDLE)
+	   2) ATRIB, (INT, 1), (IDLE), (VAR, prod)
+	   3) PARAM, (INT, 1), (IDLE), (IDLE)
+	   4) NOP, (IDLE), (IDLE), (IDLE)
+	   5) LE, (VAR, i), (VAR, n), (VAR, ##1)
+	   6) JF, (VAR, ##1), (IDLE), (ROTULO, 13)
+	   7) NOP, (IDLE), (IDLE), (IDLE)
+	   8) MULT, (VAR, prod), (VAR, i), (VAR, ##3)
+	   9) ATRIB, (VAR, ##3), (IDLE), (VAR, prod)
+	  10) NOP, (IDLE), (IDLE), (IDLE)
+	  11) MAIS, (VAR, i), (INT, 1), (VAR, ##2)
+	  12) JUMP, (IDLE), (IDLE), (ROTULO, 4)
+	  13) NOP, (IDLE), (IDLE), (IDLE)
+	  14) OPRETURN, (VAR, prod), (IDLE), (IDLE)
+
+Quadruplas do modulo ##principal:
+
+	   1) OPENMOD, (FUNCAO, ##principal), (IDLE), (IDLE)
+	   2) PARAM, (CADEIA, Numero: ), (IDLE), (IDLE)
+	   3) WRITE, (INT, 1), (IDLE), (IDLE)
+	   4) PARAM, (VAR, n), (IDLE), (IDLE)
+	   5) READ, (INT, 1), (IDLE), (IDLE)
+	   6) ATRIB, (INT, 2), (IDLE), (VAR, k)
+	   7) PARAM, (VAR, n), (IDLE), (IDLE)
+	   8) OPCALL, (FUNCAO, fatorial), (INT, 1), (VAR, ##4)
+	   9) ATRIB, (VAR, ##4), (IDLE), (VAR, n)
+	  10) PARAM, (VAR, letra), (IDLE), (IDLE)
+	  11) READ, (INT, 1), (IDLE), (IDLE)
+	  12) PARAM, (VAR, letra), (IDLE), (IDLE)
+	  13) OPCALL, (PROCEDIMENTO, Hello), (INT, 1), (VAR, ##5)
+	  14) PARAM, (CADEIA, Fatorial de ), (IDLE), (IDLE)
+	  15) PARAM, (VAR, n), (IDLE), (IDLE)
+	  16) PARAM, (CADEIA,  ), (IDLE), (IDLE)
+	  17) PARAM, (VAR, n), (IDLE), (IDLE)
+	  18) OPCALL, (FUNCAO, fatorial), (INT, 1), (VAR, ##6)
+	  19) PARAM, (VAR, ##6), (IDLE), (IDLE)
+	  20) WRITE, (INT, 4), (IDLE), (IDLE)
+	  21) OPRETURN, (IDLE), (IDLE), (IDLE)

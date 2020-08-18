@@ -1,0 +1,80 @@
+programa VerificaDivisor {{{
+funcao logic ehDivisor ( int d , int n )
+comandos {
+se ( d % n == 0 )
+retornar verdade ;
+senao
+retornar falso ;
+}
+principal
+var {
+int ( d , n )
+}
+comandos {
+escrever ( "Numero: " ) ;
+ler ( n ) ;
+escrever ( "Possivel divisor: " ) ;
+ler ( d ) ;
+escrever ( ehDivisor (d , n ) ) ;
+}
+}}}
+
+
+
+   TABELA  DE  SIMBOLOS:
+
+Classe 4:
+  (##1, IDVAR, INTEGER, 1, 1, ehDivisor)
+  (VerificaDivisor, IDPROG, ##global)
+Classe 5:
+  (##2, IDVAR, LOGICAL, 1, 1, ehDivisor)
+  (##global, IDGLOB)
+Classe 6:
+  (##3, IDVAR, LOGICAL, 1, 1, ##principal)
+Classe 8:
+  (d, IDVAR, INTEGER, 1, 1, ##principal)
+  (d, IDVAR, INTEGER, 1, 1, ehDivisor)
+Classe 18:
+  (n, IDVAR, INTEGER, 1, 1, ##principal)
+  (n, IDVAR, INTEGER, 1, 1, ehDivisor)
+Classe 20:
+  (##principal, IDPRINCIPAL, ##global)
+Classe 21:
+  (ehDivisor, IDFUNC, LOGICAL, ##global)
+
+
+Quadruplas do modulo VerificaDivisor:
+
+	   1) OPENMOD, (MODULO, VerificaDivisor), (IDLE), (IDLE)
+	   2) OPCALL, (FUNCAO, ##principal), (IDLE), (IDLE)
+	   3) EXIT, (IDLE), (IDLE), (IDLE)
+
+Quadruplas do modulo ehDivisor:
+
+	   1) OPENMOD, (FUNCAO, ehDivisor), (IDLE), (IDLE)
+	   2) RESTO, (VAR, d), (VAR, n), (VAR, ##1)
+	   3) EQ, (VAR, ##1), (INT, 0), (VAR, ##2)
+	   4) JF, (VAR, ##2), (IDLE), (ROTULO, 7)
+	   5) OPRETURN, (LOGIC, 1), (IDLE), (IDLE)
+	   6) JUMP, (IDLE), (IDLE), (ROTULO, 9)
+	   7) NOP, (IDLE), (IDLE), (IDLE)
+	   8) OPRETURN, (LOGIC, 0), (IDLE), (IDLE)
+	   9) NOP, (IDLE), (IDLE), (IDLE)
+
+Quadruplas do modulo ##principal:
+
+	   1) OPENMOD, (FUNCAO, ##principal), (IDLE), (IDLE)
+	   2) PARAM, (CADEIA, Numero: ), (IDLE), (IDLE)
+	   3) WRITE, (INT, 1), (IDLE), (IDLE)
+	   4) PARAM, (VAR, n), (IDLE), (IDLE)
+	   5) READ, (INT, 1), (IDLE), (IDLE)
+	   6) PARAM, (CADEIA, Possivel divisor: ), (IDLE), (IDLE)
+	   7) WRITE, (INT, 1), (IDLE), (IDLE)
+	   8) PARAM, (VAR, d), (IDLE), (IDLE)
+	   9) READ, (INT, 1), (IDLE), (IDLE)
+	  10) PARAM, (VAR, d), (IDLE), (IDLE)
+	  11) PARAM, (VAR, n), (IDLE), (IDLE)
+	  12) OPCALL, (FUNCAO, ehDivisor), (INT, 2), (VAR, ##3)
+	  13) PARAM, (VAR, ##3), (IDLE), (IDLE)
+	  14) WRITE, (INT, 1), (IDLE), (IDLE)
+	  15) OPRETURN, (IDLE), (IDLE), (IDLE)

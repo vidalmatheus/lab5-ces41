@@ -1,0 +1,107 @@
+programa Exponencial {{{
+funcao real exp ( int n )
+var {
+int ( i )
+real ( result , e )
+}
+comandos {
+i = 1 ;
+e = 2.71 ;
+result = e ;
+repetir {
+result = result * e ;
+i = i + 1 ;
+}
+enquanto ( i < n ) ;
+retornar result ;
+}
+principal
+var {
+int ( n )
+carac ( c )
+real ( x )
+}
+comandos {
+escrever ( "Numero: " ) ;
+ler ( n ) ;
+c = 'e' ;
+escrever ( "Result: " , c , "^" , n , "=" , exp (n ) ) ;
+x = exp (n ) ;
+}
+}}}
+
+
+
+   TABELA  DE  SIMBOLOS:
+
+Classe 4:
+  (##1, IDVAR, FLOAT, 1, 1, exp)
+  (result, IDVAR, FLOAT, 1, 1, exp)
+Classe 5:
+  (x, IDVAR, FLOAT, 1, 1, ##principal)
+  (##2, IDVAR, INTEGER, 1, 1, exp)
+  (##global, IDGLOB)
+Classe 6:
+  (##3, IDVAR, LOGICAL, 1, 1, exp)
+Classe 7:
+  (##4, IDVAR, FLOAT, 1, 1, ##principal)
+  (c, IDVAR, CHAR, 1, 1, ##principal)
+Classe 8:
+  (##5, IDVAR, FLOAT, 1, 1, ##principal)
+Classe 9:
+  (e, IDVAR, FLOAT, 1, 1, exp)
+Classe 11:
+  (exp, IDFUNC, FLOAT, ##global)
+Classe 13:
+  (i, IDVAR, INTEGER, 1, 1, exp)
+Classe 15:
+  (Exponencial, IDPROG, ##global)
+Classe 18:
+  (n, IDVAR, INTEGER, 1, 1, ##principal)
+  (n, IDVAR, INTEGER, 1, 1, exp)
+Classe 20:
+  (##principal, IDPRINCIPAL, ##global)
+
+
+Quadruplas do modulo Exponencial:
+
+	   1) OPENMOD, (MODULO, Exponencial), (IDLE), (IDLE)
+	   2) OPCALL, (FUNCAO, ##principal), (IDLE), (IDLE)
+	   3) EXIT, (IDLE), (IDLE), (IDLE)
+
+Quadruplas do modulo exp:
+
+	   1) OPENMOD, (FUNCAO, exp), (IDLE), (IDLE)
+	   2) ATRIB, (INT, 1), (IDLE), (VAR, i)
+	   3) ATRIB, (REAL, 2.71), (IDLE), (VAR, e)
+	   4) ATRIB, (VAR, e), (IDLE), (VAR, result)
+	   5) NOP, (IDLE), (IDLE), (IDLE)
+	   6) MULT, (VAR, result), (VAR, e), (VAR, ##1)
+	   7) ATRIB, (VAR, ##1), (IDLE), (VAR, result)
+	   8) MAIS, (VAR, i), (INT, 1), (VAR, ##2)
+	   9) ATRIB, (VAR, ##2), (IDLE), (VAR, i)
+	  10) LT, (VAR, i), (VAR, n), (VAR, ##3)
+	  11) JF, (VAR, ##3), (IDLE), (ROTULO, 5)
+	  12) OPRETURN, (VAR, result), (IDLE), (IDLE)
+
+Quadruplas do modulo ##principal:
+
+	   1) OPENMOD, (FUNCAO, ##principal), (IDLE), (IDLE)
+	   2) PARAM, (CADEIA, Numero: ), (IDLE), (IDLE)
+	   3) WRITE, (INT, 1), (IDLE), (IDLE)
+	   4) PARAM, (VAR, n), (IDLE), (IDLE)
+	   5) READ, (INT, 1), (IDLE), (IDLE)
+	   6) ATRIB, (CARAC, e), (IDLE), (VAR, c)
+	   7) PARAM, (CADEIA, Result: ), (IDLE), (IDLE)
+	   8) PARAM, (VAR, c), (IDLE), (IDLE)
+	   9) PARAM, (CADEIA, ^), (IDLE), (IDLE)
+	  10) PARAM, (VAR, n), (IDLE), (IDLE)
+	  11) PARAM, (CADEIA, =), (IDLE), (IDLE)
+	  12) PARAM, (VAR, n), (IDLE), (IDLE)
+	  13) OPCALL, (FUNCAO, exp), (INT, 1), (VAR, ##4)
+	  14) PARAM, (VAR, ##4), (IDLE), (IDLE)
+	  15) WRITE, (INT, 6), (IDLE), (IDLE)
+	  16) PARAM, (VAR, n), (IDLE), (IDLE)
+	  17) OPCALL, (FUNCAO, exp), (INT, 1), (VAR, ##5)
+	  18) ATRIB, (VAR, ##5), (IDLE), (VAR, x)
+	  19) OPRETURN, (IDLE), (IDLE), (IDLE)

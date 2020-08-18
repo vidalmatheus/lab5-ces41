@@ -1,0 +1,188 @@
+programa HelloWorld {{{
+principal
+var {
+int ( n , mat [ 5 , 5 ] )
+}
+comandos {
+escrever ( "Hello World!" ) ;
+mat [ 3 , 4 ] = 10 ;
+mat [ 1 , 1 ] = mat [ 3 , 4 ] + 2 ;
+n = mat [ 3 , 5 ] + mat [ 3 , 4 ] ;
+n = mat [ 3 , 5 ] - mat [ 3 , 4 ] ;
+n = mat [ 2 , 2 ] + 5 - mat [ 3 , 4 ] ;
+n = 2 * mat [ 3 , 5 ] ;
+n = mat [ 3 , 5 ] * 3 ;
+n = 2 * mat [ 3 , 5 ] * 3 ;
+n = mat [ 3 , 5 ] / 3 ;
+n = 2 / mat [ 3 , 5 ] ;
+n = mat [ 3 , 5 ] % 3 ;
+n = 3 % mat [ 3 , 5 ] ;
+n = mat [ 3 , 4 ] * 2 + 1 / mat [ 3 , 4 ] + mat [ 3 , 4 ] % 2 ;
+}
+}}}
+
+
+
+   TABELA  DE  SIMBOLOS:
+
+Classe 0:
+  (mat, IDVAR, INTEGER, 1, 1, EH ARRAY
+	ndims = 2, dimensoes:  5  5, ##principal)
+Classe 4:
+  (##1, IDVAR, INTEGER, 1, 1, ##principal)
+Classe 5:
+  (##2, IDVAR, INTEGER, 1, 1, ##principal)
+  (##global, IDGLOB)
+Classe 6:
+  (##10, IDVAR, INTEGER, 1, 1, ##principal)
+  (##3, IDVAR, INTEGER, 1, 1, ##principal)
+Classe 7:
+  (##20, IDVAR, INTEGER, 1, 1, ##principal)
+  (##11, IDVAR, INTEGER, 1, 1, ##principal)
+  (##4, IDVAR, INTEGER, 1, 1, ##principal)
+Classe 8:
+  (##30, IDVAR, INTEGER, 1, 1, ##principal)
+  (##21, IDVAR, INTEGER, 1, 1, ##principal)
+  (##12, IDVAR, INTEGER, 1, 1, ##principal)
+  (##5, IDVAR, INTEGER, 1, 1, ##principal)
+  (HelloWorld, IDPROG, ##global)
+Classe 9:
+  (##31, IDVAR, INTEGER, 1, 1, ##principal)
+  (##22, IDVAR, INTEGER, 1, 1, ##principal)
+  (##13, IDVAR, INTEGER, 1, 1, ##principal)
+  (##6, IDVAR, INTEGER, 1, 1, ##principal)
+Classe 10:
+  (##32, IDVAR, INTEGER, 1, 1, ##principal)
+  (##23, IDVAR, INTEGER, 1, 1, ##principal)
+  (##14, IDVAR, INTEGER, 1, 1, ##principal)
+  (##7, IDVAR, INTEGER, 1, 1, ##principal)
+Classe 11:
+  (##33, IDVAR, INTEGER, 1, 1, ##principal)
+  (##24, IDVAR, INTEGER, 1, 1, ##principal)
+  (##15, IDVAR, INTEGER, 1, 1, ##principal)
+  (##8, IDVAR, INTEGER, 1, 1, ##principal)
+Classe 12:
+  (##34, IDVAR, INTEGER, 1, 1, ##principal)
+  (##25, IDVAR, INTEGER, 1, 1, ##principal)
+  (##16, IDVAR, INTEGER, 1, 1, ##principal)
+  (##9, IDVAR, INTEGER, 1, 1, ##principal)
+Classe 13:
+  (##35, IDVAR, INTEGER, 1, 1, ##principal)
+  (##26, IDVAR, INTEGER, 1, 1, ##principal)
+  (##17, IDVAR, INTEGER, 1, 1, ##principal)
+Classe 14:
+  (##36, IDVAR, INTEGER, 1, 1, ##principal)
+  (##27, IDVAR, INTEGER, 1, 1, ##principal)
+  (##18, IDVAR, INTEGER, 1, 1, ##principal)
+Classe 15:
+  (##37, IDVAR, INTEGER, 1, 1, ##principal)
+  (##28, IDVAR, INTEGER, 1, 1, ##principal)
+  (##19, IDVAR, INTEGER, 1, 1, ##principal)
+Classe 16:
+  (##29, IDVAR, INTEGER, 1, 1, ##principal)
+Classe 18:
+  (n, IDVAR, INTEGER, 1, 1, ##principal)
+Classe 20:
+  (##principal, IDPRINCIPAL, ##global)
+
+
+Quadruplas do modulo HelloWorld:
+
+	   1) OPENMOD, (MODULO, HelloWorld), (IDLE), (IDLE)
+	   2) OPCALL, (FUNCAO, ##principal), (IDLE), (IDLE)
+	   3) EXIT, (IDLE), (IDLE), (IDLE)
+
+Quadruplas do modulo ##principal:
+
+	   1) OPENMOD, (FUNCAO, ##principal), (IDLE), (IDLE)
+	   2) PARAM, (CADEIA, Hello World!), (IDLE), (IDLE)
+	   3) WRITE, (INT, 1), (IDLE), (IDLE)
+	   4) IND, (INT, 3), (IDLE), (IDLE)
+	   5) IND, (INT, 4), (IDLE), (IDLE)
+	   6) INDEX, (VAR, mat), (INT, 2), (VAR, ##1)
+	   7) ATRIBPONT, (INT, 10), (IDLE), (VAR, ##1)
+	   8) IND, (INT, 1), (IDLE), (IDLE)
+	   9) IND, (INT, 1), (IDLE), (IDLE)
+	  10) INDEX, (VAR, mat), (INT, 2), (VAR, ##2)
+	  11) IND, (INT, 3), (IDLE), (IDLE)
+	  12) IND, (INT, 4), (IDLE), (IDLE)
+	  13) INDEX, (VAR, mat), (INT, 2), (VAR, ##3)
+	  14) MAIS, (VAR, ##3), (INT, 2), (VAR, ##4)
+	  15) ATRIBPONT, (VAR, ##4), (IDLE), (VAR, ##2)
+	  16) IND, (INT, 3), (IDLE), (IDLE)
+	  17) IND, (INT, 5), (IDLE), (IDLE)
+	  18) INDEX, (VAR, mat), (INT, 2), (VAR, ##5)
+	  19) IND, (INT, 3), (IDLE), (IDLE)
+	  20) IND, (INT, 4), (IDLE), (IDLE)
+	  21) INDEX, (VAR, mat), (INT, 2), (VAR, ##6)
+	  22) MAIS, (VAR, ##5), (VAR, ##6), (VAR, ##7)
+	  23) ATRIB, (VAR, ##7), (IDLE), (VAR, n)
+	  24) IND, (INT, 3), (IDLE), (IDLE)
+	  25) IND, (INT, 5), (IDLE), (IDLE)
+	  26) INDEX, (VAR, mat), (INT, 2), (VAR, ##8)
+	  27) IND, (INT, 3), (IDLE), (IDLE)
+	  28) IND, (INT, 4), (IDLE), (IDLE)
+	  29) INDEX, (VAR, mat), (INT, 2), (VAR, ##9)
+	  30) MENOS, (VAR, ##8), (VAR, ##9), (VAR, ##10)
+	  31) ATRIB, (VAR, ##10), (IDLE), (VAR, n)
+	  32) IND, (INT, 2), (IDLE), (IDLE)
+	  33) IND, (INT, 2), (IDLE), (IDLE)
+	  34) INDEX, (VAR, mat), (INT, 2), (VAR, ##11)
+	  35) MAIS, (VAR, ##11), (INT, 5), (VAR, ##12)
+	  36) IND, (INT, 3), (IDLE), (IDLE)
+	  37) IND, (INT, 4), (IDLE), (IDLE)
+	  38) INDEX, (VAR, mat), (INT, 2), (VAR, ##13)
+	  39) MENOS, (VAR, ##12), (VAR, ##13), (VAR, ##14)
+	  40) ATRIB, (VAR, ##14), (IDLE), (VAR, n)
+	  41) IND, (INT, 3), (IDLE), (IDLE)
+	  42) IND, (INT, 5), (IDLE), (IDLE)
+	  43) INDEX, (VAR, mat), (INT, 2), (VAR, ##15)
+	  44) MULT, (INT, 2), (VAR, ##15), (VAR, ##16)
+	  45) ATRIB, (VAR, ##16), (IDLE), (VAR, n)
+	  46) IND, (INT, 3), (IDLE), (IDLE)
+	  47) IND, (INT, 5), (IDLE), (IDLE)
+	  48) INDEX, (VAR, mat), (INT, 2), (VAR, ##17)
+	  49) MULT, (VAR, ##17), (INT, 3), (VAR, ##18)
+	  50) ATRIB, (VAR, ##18), (IDLE), (VAR, n)
+	  51) IND, (INT, 3), (IDLE), (IDLE)
+	  52) IND, (INT, 5), (IDLE), (IDLE)
+	  53) INDEX, (VAR, mat), (INT, 2), (VAR, ##19)
+	  54) MULT, (INT, 2), (VAR, ##19), (VAR, ##20)
+	  55) MULT, (VAR, ##20), (INT, 3), (VAR, ##21)
+	  56) ATRIB, (VAR, ##21), (IDLE), (VAR, n)
+	  57) IND, (INT, 3), (IDLE), (IDLE)
+	  58) IND, (INT, 5), (IDLE), (IDLE)
+	  59) INDEX, (VAR, mat), (INT, 2), (VAR, ##22)
+	  60) DIV, (VAR, ##22), (INT, 3), (VAR, ##23)
+	  61) ATRIB, (VAR, ##23), (IDLE), (VAR, n)
+	  62) IND, (INT, 3), (IDLE), (IDLE)
+	  63) IND, (INT, 5), (IDLE), (IDLE)
+	  64) INDEX, (VAR, mat), (INT, 2), (VAR, ##24)
+	  65) DIV, (INT, 2), (VAR, ##24), (VAR, ##25)
+	  66) ATRIB, (VAR, ##25), (IDLE), (VAR, n)
+	  67) IND, (INT, 3), (IDLE), (IDLE)
+	  68) IND, (INT, 5), (IDLE), (IDLE)
+	  69) INDEX, (VAR, mat), (INT, 2), (VAR, ##26)
+	  70) RESTO, (VAR, ##26), (INT, 3), (VAR, ##27)
+	  71) ATRIB, (VAR, ##27), (IDLE), (VAR, n)
+	  72) IND, (INT, 3), (IDLE), (IDLE)
+	  73) IND, (INT, 5), (IDLE), (IDLE)
+	  74) INDEX, (VAR, mat), (INT, 2), (VAR, ##28)
+	  75) RESTO, (INT, 3), (VAR, ##28), (VAR, ##29)
+	  76) ATRIB, (VAR, ##29), (IDLE), (VAR, n)
+	  77) IND, (INT, 3), (IDLE), (IDLE)
+	  78) IND, (INT, 4), (IDLE), (IDLE)
+	  79) INDEX, (VAR, mat), (INT, 2), (VAR, ##30)
+	  80) MULT, (VAR, ##30), (INT, 2), (VAR, ##31)
+	  81) IND, (INT, 3), (IDLE), (IDLE)
+	  82) IND, (INT, 4), (IDLE), (IDLE)
+	  83) INDEX, (VAR, mat), (INT, 2), (VAR, ##32)
+	  84) DIV, (INT, 1), (VAR, ##32), (VAR, ##33)
+	  85) MAIS, (VAR, ##31), (VAR, ##33), (VAR, ##34)
+	  86) IND, (INT, 3), (IDLE), (IDLE)
+	  87) IND, (INT, 4), (IDLE), (IDLE)
+	  88) INDEX, (VAR, mat), (INT, 2), (VAR, ##35)
+	  89) RESTO, (VAR, ##35), (INT, 2), (VAR, ##36)
+	  90) MAIS, (VAR, ##34), (VAR, ##36), (VAR, ##37)
+	  91) ATRIB, (VAR, ##37), (IDLE), (VAR, n)
+	  92) OPRETURN, (IDLE), (IDLE), (IDLE)
