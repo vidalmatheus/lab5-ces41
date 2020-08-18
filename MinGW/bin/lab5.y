@@ -613,7 +613,7 @@ CmdPara	    	:   PARA  {printf ("para ");}  Variavel
                     {
                         if ($15.tipo != INTEGER && $15.tipo != CHAR)
                             Incompatibilidade ("Expressao do tipo nao inteira e nao caractere em comando para");
-                    }  FPAR {printf (") ");}
+                    }  FPAR {printf (") \n");}
                         {$<quad>$ = quadcorrente;}
                         {$<quad>$ = GeraQuadrupla (NOP, opndidle, opndidle, opndidle);}
                         Comando {
@@ -763,10 +763,6 @@ CmdRetornar  	:	RETORNAR  PVIRG {
 CmdAtrib      	:   Variavel  {if  ($1.simb != NULL) $1.simb->inic = $1.simb->ref = TRUE;}
                     ATRIB  {printf ("= "); indexada = FALSE;}  Expressao  {
                         if (indexada) {
-                            // opndaux = result;
-                            // result.tipo = VAROPND;
-                            // result.atr.simb = NovaTemp($5.tipo, escopo);
-                            // GeraQuadrupla (CONTAPONT, opndaux, opndidle, result);
                             GeraQuadrupla (OPATRIB, result, opndidle, $1.opnd);
                         }
                     }
@@ -995,6 +991,7 @@ ExprAux3    	:   ExprAux4 {
                 ;
 ExprAux4    	:   Termo
                 |   ExprAux4  OPAD  {
+                        opndaux2 = result;
                         switch ($2) {
                             case MAIS: printf ("+ "); break;
                             case MENOS: printf ("- "); break;
@@ -1006,13 +1003,36 @@ ExprAux4    	:   Termo
                         else $$.tipo = INTEGER;
                         $$.opnd.tipo = VAROPND;
                         $$.opnd.atr.simb = NovaTemp ($$.tipo, escopo);
-                        if ($2 == MAIS)
-                            GeraQuadrupla (OPMAIS, $1.opnd, $4.opnd, $$.opnd);
-                        else  GeraQuadrupla (OPMENOS, $1.opnd, $4.opnd, $$.opnd);
+                        if ($2 == MAIS){
+                            if ($1.opnd.tipo == INDEXOPND && $4.opnd.tipo == INDEXOPND){
+                                GeraQuadrupla (OPMAIS, opndaux2, result, $$.opnd);
+                            }
+                            else if ($1.opnd.tipo != INDEXOPND && $4.opnd.tipo == INDEXOPND){
+                                GeraQuadrupla (OPMAIS, $1.opnd, result, $$.opnd);
+                            }
+                            else if ($1.opnd.tipo == INDEXOPND && $4.opnd.tipo != INDEXOPND){
+                                GeraQuadrupla (OPMAIS, opndaux2, $4.opnd, $$.opnd);
+                            }
+                            else GeraQuadrupla (OPMAIS, $1.opnd, $4.opnd, $$.opnd);
+                        }    
+                        else{
+                            if ($1.opnd.tipo == INDEXOPND && $4.opnd.tipo == INDEXOPND){
+                                GeraQuadrupla (OPMENOS, opndaux2, result, $$.opnd);
+                            }
+                            else if ($1.opnd.tipo != INDEXOPND && $4.opnd.tipo == INDEXOPND){
+                                GeraQuadrupla (OPMENOS, $1.opnd, result, $$.opnd);
+                            }
+                            else if ($1.opnd.tipo == INDEXOPND && $4.opnd.tipo != INDEXOPND){
+                                GeraQuadrupla (OPMENOS, opndaux2, $4.opnd, $$.opnd);
+                            }
+                            else GeraQuadrupla (OPMENOS, $1.opnd, $4.opnd, $$.opnd);
+                        }
+                        result = $$.opnd;
                     }
                 ;
 Termo  	    	:   Fator
                 |   Termo  OPMULT  {
+                        opndaux2 = result;
                         switch ($2) {
                             case MULT: printf ("* "); break;
                             case DIV: printf ("/ "); break;
@@ -1028,9 +1048,30 @@ Termo  	    	:   Fator
                                 else $$.tipo = INTEGER;
                                 $$.opnd.tipo = VAROPND;
                                 $$.opnd.atr.simb = NovaTemp ($$.tipo, escopo);
-                                if ($2 == MULT)
-                                    GeraQuadrupla   (OPMULTIP, $1.opnd, $4.opnd, $$.opnd);
-                                else  GeraQuadrupla  (OPDIV, $1.opnd, $4.opnd, $$.opnd);
+                                if ($2 == MULT){
+                                    if ($1.opnd.tipo == INDEXOPND && $4.opnd.tipo == INDEXOPND){
+                                        GeraQuadrupla (OPMULTIP, opndaux2, result, $$.opnd);
+                                    }
+                                    else if ($1.opnd.tipo != INDEXOPND && $4.opnd.tipo == INDEXOPND){
+                                        GeraQuadrupla (OPMULTIP, $1.opnd, result, $$.opnd);
+                                    }
+                                    else if ($1.opnd.tipo == INDEXOPND && $4.opnd.tipo != INDEXOPND){
+                                        GeraQuadrupla (OPMULTIP, opndaux2, $4.opnd, $$.opnd);
+                                    }
+                                    else GeraQuadrupla (OPMULTIP, $1.opnd, $4.opnd, $$.opnd);
+                                }
+                                else {
+                                     if ($1.opnd.tipo == INDEXOPND && $4.opnd.tipo == INDEXOPND){
+                                        GeraQuadrupla (OPDIV, opndaux2, result, $$.opnd);
+                                    }
+                                    else if ($1.opnd.tipo != INDEXOPND && $4.opnd.tipo == INDEXOPND){
+                                        GeraQuadrupla (OPDIV, $1.opnd, result, $$.opnd);
+                                    }
+                                    else if ($1.opnd.tipo == INDEXOPND && $4.opnd.tipo != INDEXOPND){
+                                        GeraQuadrupla (OPDIV, opndaux2, $4.opnd, $$.opnd);
+                                    }
+                                    else GeraQuadrupla (OPDIV, $1.opnd, $4.opnd, $$.opnd);
+                                } 
                                 break;
                             case RESTO:
                                 if ($1.tipo != INTEGER && $1.tipo != CHAR
@@ -1039,9 +1080,19 @@ Termo  	    	:   Fator
                                 $$.tipo = INTEGER;
                                 $$.opnd.tipo = VAROPND;
                                 $$.opnd.atr.simb = NovaTemp ($$.tipo, escopo);
-                                GeraQuadrupla (OPRESTO, $1.opnd, $4.opnd, $$.opnd);
+                                if ($1.opnd.tipo == INDEXOPND && $4.opnd.tipo == INDEXOPND){
+                                    GeraQuadrupla (OPRESTO, opndaux2, result, $$.opnd);
+                                }
+                                else if ($1.opnd.tipo != INDEXOPND && $4.opnd.tipo == INDEXOPND){
+                                    GeraQuadrupla (OPRESTO, $1.opnd, result, $$.opnd);
+                                }
+                                else if ($1.opnd.tipo == INDEXOPND && $4.opnd.tipo != INDEXOPND){
+                                    GeraQuadrupla (OPRESTO, opndaux2, $4.opnd, $$.opnd);
+                                }
+                                else GeraQuadrupla (OPRESTO, $1.opnd, $4.opnd, $$.opnd);
                                 break;
                         }
+                        result = $$.opnd;
                     }
                 ;
 Fator		    :   Variavel  {
