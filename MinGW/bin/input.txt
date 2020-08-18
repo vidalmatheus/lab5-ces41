@@ -9,12 +9,13 @@ programa HelloWorld {{{
    }
    comandos {
           /*escrever("Hello World!");
-          mat[3,4] = 10;
+          
           ler(mat[3,4], mat[4,5]);*/
 
 
-
-
+          mat[3,4] = 10;
+          mat[1,1] = mat[3,4] + 2;
+          /*
           n = mat[3,5] + mat[3,4];
           n = mat[3,5] - mat[3,4];
           n = mat[2,2] + 5 - mat[3,4];
@@ -25,6 +26,7 @@ programa HelloWorld {{{
           n = 2/mat[3,5];
           n = mat[3,5]%3;
           n = 3%mat[3,5];
+          */
 
 
           n = mat[3,4]*2 + 1/mat[3,4] + mat[3,4]%2;

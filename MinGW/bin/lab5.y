@@ -218,7 +218,7 @@ struct celmodhead {
 quadrupla quadcorrente, quadaux, quadaux2;
 modhead codintermed, modcorrente, modglobal, modaux;
 int oper, numquadcorrente;
-operando opnd1, opnd2, result, opndaux, opndaux2;
+operando opnd1, opnd2, result, opndaux, opndaux2, opndaux3;
 int numtemp;
 const operando opndidle = {IDLEOPND, 0};
 
@@ -554,7 +554,6 @@ CmdEnquanto   	:	ENQUANTO  ABPAR  {
                         if ($4.tipo != LOGICAL)
                             Incompatibilidade ("Expressao nao logica em comando enquanto");
                         opndaux.tipo = ROTOPND;
-                        printf("        $4.opnd.tipo\n", $4.opnd.tipo);
                         if ($4.opnd.tipo == INDEXOPND){
                             $<quad>$ = GeraQuadrupla (OPJF, result, opndidle, opndaux);
                         }
@@ -760,9 +759,9 @@ CmdRetornar  	:	RETORNAR  PVIRG {
                     }  PVIRG  {printf (";\n");}
                 ;
 
-CmdAtrib      	:   Variavel  {if  ($1.simb != NULL) $1.simb->inic = $1.simb->ref = TRUE;}
+CmdAtrib      	:   Variavel  {opndaux3 = result; if  ($1.simb != NULL) $1.simb->inic = $1.simb->ref = TRUE;}
                     ATRIB  {printf ("= "); indexada = FALSE;}  Expressao  {
-                        if (indexada) {
+                        if (indexada && $1.simb->ndims == 0) {
                             GeraQuadrupla (OPATRIB, result, opndidle, $1.opnd);
                         }
                     }
@@ -776,7 +775,7 @@ CmdAtrib      	:   Variavel  {if  ($1.simb != NULL) $1.simb->inic = $1.simb->ref
                                 ($1.simb->tvar == LOGICAL && $5.tipo != LOGICAL))
                                 Incompatibilidade ("Lado direito de comando de atribuicao improprio");
                                 if ($1.simb->ndims > 0)
-                                    GeraQuadrupla (ATRIBPONT, $5.opnd, opndidle, result);
+                                    GeraQuadrupla (ATRIBPONT, $5.opnd, opndidle, opndaux3);
                                 else if (!indexada) 
                                     GeraQuadrupla (OPATRIB, $5.opnd, opndidle, $1.opnd);
                         }
