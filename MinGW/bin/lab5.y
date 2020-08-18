@@ -789,23 +789,50 @@ ListExpr		:  	Expressao {
                     }
                 ;
 Expressao     	:   ExprAux1
-				|   Expressao  OR  {printf ("|| ");}  ExprAux1  {
+				|   Expressao  OR  {
+                        printf ("|| ");
+                        opndaux2 = result;
+                    }  ExprAux1  {
                         if ($1.tipo != LOGICAL || $4.tipo != LOGICAL)
                             Incompatibilidade ("Operando improprio para operador or");
                         $$.tipo = LOGICAL;
                         $$.opnd.tipo = VAROPND;
                         $$.opnd.atr.simb = NovaTemp ($$.tipo, escopo);
-                        GeraQuadrupla (OPOR, $1.opnd, $4.opnd, $$.opnd);
+
+                        if ($1.opnd.tipo == INDEXOPND && $4.opnd.tipo == INDEXOPND){
+                            GeraQuadrupla (OPOR, opndaux2, result, $$.opnd);
+                        }
+                        else if ($1.opnd.tipo != INDEXOPND && $4.opnd.tipo == INDEXOPND){
+                            GeraQuadrupla (OPOR, $1.opnd, result, $$.opnd);
+                        }
+                        else if ($1.opnd.tipo == INDEXOPND && $4.opnd.tipo != INDEXOPND){
+                            GeraQuadrupla (OPOR, opndaux2, $4.opnd, $$.opnd);
+                        }
+                        else GeraQuadrupla (OPOR, $1.opnd, $4.opnd, $$.opnd);
                     }
                 ;
 ExprAux1    	:   ExprAux2
-				|   ExprAux1  AND  {printf ("&& ");}  ExprAux2  {
+				|   ExprAux1  AND  {
+                        printf ("&& ");
+                        opndaux2 = result;
+                    }  
+                    ExprAux2  {
                         if ($1.tipo != LOGICAL || $4.tipo != LOGICAL)
                             Incompatibilidade ("Operando improprio para operador and");
                         $$.tipo = LOGICAL;
                         $$.opnd.tipo = VAROPND;
                         $$.opnd.atr.simb = NovaTemp ($$.tipo, escopo);
-                        GeraQuadrupla (OPAND, $1.opnd, $4.opnd, $$.opnd);
+
+                        if ($1.opnd.tipo == INDEXOPND && $4.opnd.tipo == INDEXOPND){
+                            GeraQuadrupla (OPAND, opndaux2, result, $$.opnd);
+                        }
+                        else if ($1.opnd.tipo != INDEXOPND && $4.opnd.tipo == INDEXOPND){
+                            GeraQuadrupla (OPAND, $1.opnd, result, $$.opnd);
+                        }
+                        else if ($1.opnd.tipo == INDEXOPND && $4.opnd.tipo != INDEXOPND){
+                            GeraQuadrupla (OPAND, opndaux2, $4.opnd, $$.opnd);
+                        }
+                        else GeraQuadrupla (OPAND, $1.opnd, $4.opnd, $$.opnd);
                     }
                 ;
 ExprAux2    	:   ExprAux3

@@ -12,13 +12,19 @@ programa HelloWorld {{{
           mat[3,4] = 10;
           ler(mat[3,4], mat[4,5]);
 
-          n = mat[2,2];
+          n = mat[2,2] + 5;
           escrever(mat[3,4], mat[2,1]);
 
           v[1,2] = falso;
           v[1,1] = verdade;
-          se (v[1,2] != verdade)
+          se (v[1,2] && v[1,1])
                c = 'b';
+
+          se (v[1,2] || v[1,1])
+               c = 'y';
+
+          se (v[1,1])
+               c = 'z';
           
           n = 15;
           ler(c);
